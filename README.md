@@ -1,6 +1,8 @@
 # Time Limiter Firefox Extension
 
-Extension for Firefox Web Browser for monitoring And limiting the time you spend on websites. Allows for custom break time.
+Extension for Firefox Web Browser. Monitor And Limit the time you spend on websites and in total. Allows for custom break time.
+
+Floating Panel (created on every page by this extension) is Both Resizeable and Movable. Minimalize it by clicking the clock icon
 
 ## Screenshots
 
@@ -20,7 +22,9 @@ Extension for Firefox Web Browser for monitoring And limiting the time you spend
   - [ ] Fade In
   - [ ] Stop Break After Some Time Button
 - Limiter Window
-  - [ ] Static Half transparent
+  - [x] Movable and Resizable Panel
+  - [ ] Limit Position (to 0 and max page size)
+  - [x] Static Half transparent
   - [ ] Get Settings only after extending
   - Without Extending:
     - [ ] Minimalize Button
@@ -28,11 +32,16 @@ Extension for Firefox Web Browser for monitoring And limiting the time you spend
     - [ ] Time Left Until Break
     - [ ] Extend Button
   - After Extending:
+    - [ ] Disable Animations
+    - [ ] Dark Mode
+    - [ ] Show Current Time While Using Firefox
+    - [ ] Show Current Time While Using Current Website
     - [ ] Reset Break Time On This Page Button
-    - [ ] Reset Break Time On All Pages Button
+    - [ ] Set Time Limit In Firefox
     - [ ] Set Time Limit On Pages List
     - [ ] Enable Break Time
-    - [ ] Set Break Time
+    - [ ] Set Break Time for Firefox
+    - [ ] Set Break Time List
     - [ ] Edit Transparency
     - [ ] Edit Background Transparency
 
