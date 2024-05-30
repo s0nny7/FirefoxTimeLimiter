@@ -186,9 +186,33 @@ function createPanel() {
 
     document.addEventListener('mousemove', function (event) {
         if (isDown) {
-            panel.style.left = (event.clientX + offset[0]) + 'px';
-            panel.style.top = (event.clientY + offset[1]) + 'px';
-            panel.style.right = "";
+            let leftOffsetPx = event.clientX + offset[0];
+            let topOffsetPx = event.clientY + offset[1];
+
+            let leftOffset;
+            //Left Bounds check
+            if (leftOffsetPx + panel.offsetWidth > window.innerWidth) {
+                leftOffset = (window.innerWidth - panel.offsetWidth) / window.innerWidth * 100
+            } else if (leftOffsetPx < 0) {
+                leftOffset = 0
+            } else {
+                leftOffset = leftOffsetPx / window.innerWidth * 100
+            }
+
+
+            let topOffset;
+            //Top bounds check
+            if (topOffsetPx + panel.offsetHeight > window.innerHeight) {
+                topOffsetPx = (window.innerHeight - panel.offsetHeight) / window.innerHeight * 100
+            } else if (topOffsetPx < 0) {
+                topOffset = 0
+            } else {
+                topOffset = topOffsetPx / window.innerHeight * 100
+            }
+
+
+            panel.style.left = leftOffset + '%';
+            panel.style.top = topOffset + '%';
         }
     }, true);
 

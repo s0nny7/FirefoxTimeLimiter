@@ -23,11 +23,10 @@ Floating Panel (created on every page by this extension) is Both Resizeable and 
   - [ ] Stop Break After Some Time Button
 - Limiter Window
   - [x] Movable and Resizable Panel
-  - [ ] Limit Position (to 0 and max page size)
+  - [x] Limit Position (to 0 and max page size)
   - [x] Static Half transparent
-  - [ ] Get Settings only after extending
   - Without Extending:
-    - [ ] Minimalize Button
+    - [x] Minimize Button
     - [ ] Current Time On Page
     - [ ] Time Left Until Break
     - [ ] Extend Button
