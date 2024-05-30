@@ -119,6 +119,13 @@ function createPanel() {
     //Add Static limiter panel above everything
     let panel = document.createElement("div");
     panel.id = "com-limitlost-limiter-panel";
+
+    //Remove transition class when resizing
+    panel.addEventListener('mousedown', function (e) {
+        if (e.target == panel) {
+            panel.classList.remove("transition")
+        }
+    });
     
     //Create Elements Inside of Panel
     let content = document.createElement("div");
@@ -126,6 +133,37 @@ function createPanel() {
 
     //Top Bar
     topBar.id = "com-limitlost-limiter-top-bar"
+
+    let topBarButton = document.createElement("button");
+    topBarButton.id = "com-limitlost-limiter-top-bar-button"
+    topBarButton.innerHTML = iconSvg();
+
+    topBarButton.onclick = function () {
+        if (!minimized) {
+            if (panel.style.width == "") {
+                panel.style.width = panel.offsetWidth + "px"
+            }
+            if (panel.style.height == "") {
+                panel.style.height = panel.offsetHeight + "px"
+            }
+            panel.classList.add("transition");
+            oldSizeWidth = panel.style.width;
+            oldSizeHeight = panel.style.height;
+            panel.style.width = "0px";
+            panel.style.height = "0px";
+            panel.style.resize = "none";
+        } else {
+            panel.classList.add("transition");
+            panel.style.width = oldSizeWidth;
+            panel.style.height = oldSizeHeight;
+            panel.style.resize = "";
+        }
+
+
+        minimized = !minimized
+    }
+
+    topBar.appendChild(topBarButton);
 
     //Drag Panel Events
     topBar.addEventListener('mousedown', function (e) {
