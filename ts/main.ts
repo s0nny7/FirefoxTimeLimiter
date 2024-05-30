@@ -9,6 +9,12 @@ function nowUtcMillis() {
 // Drag Panel Variables
 var isDown = false;
 var offset = [0, 0];
+
+//Minimize Variables
+var minimized = false;
+var oldSizeWidth = "";
+var oldSizeHeight = "";
+
 function style() {
     let style = document.getElementById("com-limitlost-limiter-style");
 
