@@ -173,6 +173,9 @@ function createPanel() {
 
     //Drag Panel Events
     topBar.addEventListener('mousedown', function (e) {
+        if (e.button != 0) {
+            return;
+        }
         isDown = true;
         offset = [
             panel.offsetLeft - e.clientX,
