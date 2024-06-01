@@ -29,6 +29,9 @@ var oldSizeHeight = "";
 
 
 var panel: HTMLDivElement | null = null;
+var currentTimeOnPage: HTMLDivElement | null = null;
+var currentTimeFirefox: HTMLDivElement | null = null;
+var extended = false;
 
 function applyPageData() {
     if (panel != null && pageData != null) {
@@ -194,6 +197,58 @@ function formatDuration(millis: number) {
     return formatted
 }
 
+function withoutExtendingContent(content: HTMLDivElement) {
+    let table = document.createElement("table");
+    table.style.border = "none";
+    table.style.outline = "none";
+
+    // Current Time On Page
+    let row = document.createElement("tr");
+    row.id = "com-limitlost-limiter-website-time-row"
+    let name = document.createElement("td");
+    name.innerText = "Website:";
+    row.appendChild(name);
+
+    currentTimeOnPage = document.createElement("td");
+
+    row.appendChild(currentTimeOnPage);
+
+    if (page_settings?.showCurrentTimeWebsite) {
+        if (currentPageLimitCount != null) {
+            currentTimeOnPage.innerText = formatDuration(currentPageLimitCount);
+        } else {
+            currentTimeOnPage.innerText = "Limit is not counted on this page";
+        }
+
+    } else {
+        row.style.display = "none";
+    }
+    table.appendChild(row);
+
+    // Current Time In Firefox
+    row = document.createElement("tr");
+    row.id = "com-limitlost-limiter-firefox-time-row"
+    name = document.createElement("td");
+    name.innerText = "Firefox:";
+    row.appendChild(name);
+
+    currentTimeFirefox = document.createElement("td");
+    row.appendChild(currentTimeFirefox)
+
+    if (page_settings?.showCurrentTimeFirefox && currentFirefoxLimitCount != null) {
+        currentTimeFirefox.innerText = formatDuration(currentFirefoxLimitCount);
+    } else {
+        row.style.display = "none";
+    }
+    table.appendChild(row);
+
+    content.appendChild(table);
+
+    // Time Left Until Break
+    // Extend Button
+}
+
+
 function createPanel() {
     let old = document.getElementById("com-limitlost-limiter-panel")
     //Remove Old Panel If it Already Exists
@@ -303,27 +358,15 @@ function createPanel() {
     //Content
     content.id = "com-limitlost-limiter-content";
 
-    content.append("00:00:00");
-    content.append("00:00:00");
+    withoutExtendingContent(content);
 
     panel.appendChild(content);
-
-
 
     document.body.appendChild(panel);
 
     panel.style.left = `calc(90% - ${panel.clientWidth}px)`;
 
-
-
-    console.log("Created")
 }
-
-
-
-
-
-
 
 function messageListener(m: any, sender: browser.runtime.MessageSender, sendResponse: ((response?: any) => boolean | void | Promise<any>)) {
 
