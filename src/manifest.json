@@ -20,7 +20,9 @@
     },
     "background": {
         "scripts": [
+            "helpers.js",
             "settings.js",
+            "message.js",
             "background.js"
         ],
         "persistent": true
@@ -31,7 +33,9 @@
                 "<all_urls>"
             ],
             "js": [
+                "helpers.js",
                 "settings.js",
+                "message.js",
                 "main.js"
             ]
         }
