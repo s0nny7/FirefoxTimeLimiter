@@ -1,83 +1,64 @@
 class PageLimitData {
-    url: string;
+    regex: boolean = false;
     limitMillis: number;
-    constructor(url: string, limitMillis: number) {
-        this.url = url;
+
+    breakMillis: number = -1;
+    constructor(limitMillis: number) {
         this.limitMillis = limitMillis;
     }
 }
 
 class PageData {
-    url: string;
-    positionX: number | null;
-    positionY: number | null;
-    height: number | null;
-    width: number | null;
-    heightExtended: number | null;
-    widthExtended: number | null;
-    constructor(url: string) {
-        this.url = url;
-        this.positionX = null;
-        this.positionY = null;
-        this.height = null;
-        this.width = null;
-        this.heightExtended = null;
-        this.widthExtended = null;
+    positionX: number | null = null;
+    positionY: number | null = null;
+    height: number | null = null;
+    width: number | null = null;
+    heightExtended: number | null = null;
+    widthExtended: number | null = null;
+    constructor() {
     }
 }
 
 class PageBreakData {
-    url: string;
     lengthMillis: number;
-    constructor(url: string, lengthMillis: number) {
-        this.url = url;
+    constructor(lengthMillis: number) {
         this.lengthMillis = lengthMillis;
     }
 }
 
+
 class Settings {
 
-    generalPageData: PageData[] | null;
+    generalPageData: Map<string, PageData> | null = null;
 
-    animations: boolean | null;
-    darkMode: boolean | null;
-    showCurrentTimeFirefox: boolean | null;
-    showCurrentTimeWebsite: boolean | null;
-    firefoxTimeLimit: number | null;
-    websiteTimeLimit: PageLimitData[] | null;
-    breakTime: boolean | null;
-    firefoxBreakTime: number | null;
-    websiteBreakTime: PageBreakData[] | null;
-    transparency: number | null;
-    backgroundTransparency: number | null;
+    updateTimerPerMiliseconds: number | null = null;
+    animations: boolean | null = null;
+    darkMode: boolean | null = null;
+    countTimeOnLostFocus: boolean | null = null;
+    showCurrentTimeFirefox: boolean | null = null;
+    showCurrentTimeWebsite: boolean | null = null;
+    firefoxTimeLimit: number | null = null;
+    firefoxBreakTime: number | null = null;
+    websiteTimeLimit: Map<string, PageLimitData> | null = null;
+    breakTime: boolean | null = null;
+    transparency: number | null = null;
+    backgroundTransparency: number | null = null;
 
     constructor() {
-        this.generalPageData = null;
-
-        this.animations = null;
-        this.darkMode = null;
-        this.showCurrentTimeFirefox = null;
-        this.showCurrentTimeWebsite = null;
-        this.firefoxTimeLimit = null;
-        this.websiteTimeLimit = null;
-        this.breakTime = null;
-        this.firefoxBreakTime = null;
-        this.websiteBreakTime = null;
-        this.transparency = null;
-        this.backgroundTransparency = null;
     }
 
     default() {
-        this.generalPageData = this.generalPageData ?? [];
+        this.generalPageData = this.generalPageData ?? new Map();
+        this.updateTimerPerMiliseconds = this.updateTimerPerMiliseconds ?? 100;
         this.animations = this.animations ?? true;
         this.darkMode = this.darkMode ?? false;
+        this.countTimeOnLostFocus = this.countTimeOnLostFocus ?? false;
         this.showCurrentTimeFirefox = this.showCurrentTimeFirefox ?? true;
         this.showCurrentTimeWebsite = this.showCurrentTimeWebsite ?? true;
         this.firefoxTimeLimit = this.firefoxTimeLimit ?? -1;
-        this.websiteTimeLimit = this.websiteTimeLimit ?? [];
-        this.breakTime = this.breakTime ?? false;
         this.firefoxBreakTime = this.firefoxBreakTime ?? -1;
-        this.websiteBreakTime = this.websiteBreakTime ?? [];
+        this.websiteTimeLimit = this.websiteTimeLimit ?? new Map();
+        this.breakTime = this.breakTime ?? false;
         this.transparency = this.transparency ?? 1;
         this.backgroundTransparency = this.backgroundTransparency ?? 0.8;
     }
@@ -86,6 +67,7 @@ class Settings {
         let saved = await browser.storage.local.get(["generalPageData",
             "animations",
             "darkMode",
+            "countTimeOnLostFocus",
             "showCurrentTimeFirefox",
             "showCurrentTimeWebsite",
             "firefoxTimeLimit",
@@ -99,19 +81,18 @@ class Settings {
         if (saved["generalPageData"] != null) {
             this.generalPageData = JSON.parse(saved["generalPageData"]);
         }
+        this.updateTimerPerMiliseconds = saved["updateTimerPerMiliseconds"];
         this.animations = saved["animations"];
         this.darkMode = saved["darkMode"];
+        this.countTimeOnLostFocus = saved["countTimeOnLostFocus"];
         this.showCurrentTimeFirefox = saved["showCurrentTimeFirefox"];
         this.showCurrentTimeWebsite = saved["showCurrentTimeWebsite"];
         this.firefoxTimeLimit = saved["firefoxTimeLimit"];
+        this.firefoxBreakTime = saved["firefoxBreakTime"];
         if (saved["websiteTimeLimit"] != null) {
             this.websiteTimeLimit = JSON.parse(saved["websiteTimeLimit"]);
         }
         this.breakTime = saved["breakTime"];
-        this.firefoxBreakTime = saved["firefoxBreakTime"];
-        if (saved["websiteBreakTime"] != null) {
-            this.websiteBreakTime = JSON.parse(saved["websiteBreakTime"]);
-        }
         this.transparency = saved["transparency"];
         this.backgroundTransparency = saved["backgroundTransparency"];
 
@@ -121,18 +102,18 @@ class Settings {
     save() {
         let generalPageData = JSON.stringify(this.generalPageData);
         let websiteTimeLimit = JSON.stringify(this.websiteTimeLimit);
-        let websiteBreakTime = JSON.stringify(this.websiteBreakTime);
         browser.storage.local.set({
             "generalPageData": generalPageData,
+            "updateTimerPerMiliseconds": this.updateTimerPerMiliseconds,
             "animations": this.animations,
             "darkMode": this.darkMode,
+            "countTimeOnLostFocus": this.countTimeOnLostFocus,
             "showCurrentTimeFirefox": this.showCurrentTimeFirefox,
             "showCurrentTimeWebsite": this.showCurrentTimeWebsite,
             "firefoxTimeLimit": this.firefoxTimeLimit,
+            "firefoxBreakTime": this.firefoxBreakTime,
             "websiteTimeLimit": websiteTimeLimit,
             "breakTime": this.breakTime,
-            "firefoxBreakTime": this.firefoxBreakTime,
-            "websiteBreakTime": websiteBreakTime,
             "transparency": this.transparency,
             "backgroundTransparency": this.backgroundTransparency
         });
