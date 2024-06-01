@@ -1,11 +1,22 @@
 
-function nowUtcMillis() {
-    let date = new Date();
-    //Converted From Minutes To Milliseconds
-    let timezoneDiff = date.getTimezoneOffset() * 60 * 1000
-    //If you're time is later than UTC then timezoneDiff is negative
-    return date.getTime() + timezoneDiff
-}
+/**
+ * Helper variable for creating limiter panel only once
+ **/
+var first = true;
+
+//From server and for server variables
+let page_settings: Settings | null = null
+let pageData: PageData | null = null;
+/**
+ * in Milliseconds
+ */
+let currentPageLimitCount: number | null = null
+/**
+ * in Milliseconds
+ */
+let currentFirefoxLimitCount: number | null = null
+
+
 // Drag Panel Variables
 var isDown = false;
 var offset = [0, 0];
@@ -14,6 +25,28 @@ var offset = [0, 0];
 var minimized = false;
 var oldSizeWidth = "";
 var oldSizeHeight = "";
+
+
+
+var panel: HTMLDivElement | null = null;
+
+function applyPageData() {
+    if (panel != null && pageData != null) {
+        if (extended) {
+            panel.style.width = pageData.widthExtended + "px";
+            panel.style.height = pageData.heightExtended + "px";
+        } else {
+            panel.style.width = pageData.width + "px";
+            panel.style.height = pageData.height + "px";
+        }
+        if (pageData.positionX != null) {
+            panel.style.left = pageData.positionX + "%"
+        }
+        if (pageData.positionY != null) {
+            panel.style.top = pageData.positionY + "%"
+        }
+    }
+}
 
 function style() {
     let style = document.getElementById("com-limitlost-limiter-style");
@@ -169,13 +202,13 @@ function createPanel() {
     }
 
     //Add Static limiter panel above everything
-    let panel = document.createElement("div");
+    panel = document.createElement("div");
     panel.id = "com-limitlost-limiter-panel";
 
     //Remove transition class when resizing
     panel.addEventListener('mousedown', function (e) {
         if (e.target == panel) {
-            panel.classList.remove("transition")
+            panel!.classList.remove("transition")
         }
     });
     
@@ -192,23 +225,23 @@ function createPanel() {
 
     topBarButton.onclick = function () {
         if (!minimized) {
-            if (panel.style.width == "") {
-                panel.style.width = panel.offsetWidth + "px"
+            if (panel!.style.width == "") {
+                panel!.style.width = panel!.offsetWidth + "px"
             }
-            if (panel.style.height == "") {
-                panel.style.height = panel.offsetHeight + "px"
+            if (panel!.style.height == "") {
+                panel!.style.height = panel!.offsetHeight + "px"
             }
-            panel.classList.add("transition");
-            oldSizeWidth = panel.style.width;
-            oldSizeHeight = panel.style.height;
-            panel.style.width = "0px";
-            panel.style.height = "0px";
-            panel.style.resize = "none";
+            panel!.classList.add("transition");
+            oldSizeWidth = panel!.style.width;
+            oldSizeHeight = panel!.style.height;
+            panel!.style.width = "0px";
+            panel!.style.height = "0px";
+            panel!.style.resize = "none";
         } else {
-            panel.classList.add("transition");
-            panel.style.width = oldSizeWidth;
-            panel.style.height = oldSizeHeight;
-            panel.style.resize = "";
+            panel!.classList.add("transition");
+            panel!.style.width = oldSizeWidth;
+            panel!.style.height = oldSizeHeight;
+            panel!.style.resize = "";
         }
 
 
@@ -224,8 +257,8 @@ function createPanel() {
         }
         isDown = true;
         offset = [
-            panel.offsetLeft - e.clientX,
-            panel.offsetTop - e.clientY
+            panel!.offsetLeft - e.clientX,
+            panel!.offsetTop - e.clientY
         ];
     }, true);
 
@@ -240,8 +273,8 @@ function createPanel() {
 
             let leftOffset;
             //Left Bounds check
-            if (leftOffsetPx + panel.offsetWidth > window.innerWidth) {
-                leftOffset = (window.innerWidth - panel.offsetWidth) / window.innerWidth * 100
+            if (leftOffsetPx + panel!.offsetWidth > window.innerWidth) {
+                leftOffset = (window.innerWidth - panel!.offsetWidth) / window.innerWidth * 100
             } else if (leftOffsetPx < 0) {
                 leftOffset = 0
             } else {
@@ -251,8 +284,8 @@ function createPanel() {
 
             let topOffset;
             //Top bounds check
-            if (topOffsetPx + panel.offsetHeight > window.innerHeight) {
-                topOffsetPx = (window.innerHeight - panel.offsetHeight) / window.innerHeight * 100
+            if (topOffsetPx + panel!.offsetHeight > window.innerHeight) {
+                topOffsetPx = (window.innerHeight - panel!.offsetHeight) / window.innerHeight * 100
             } else if (topOffsetPx < 0) {
                 topOffset = 0
             } else {
@@ -260,8 +293,8 @@ function createPanel() {
             }
 
 
-            panel.style.left = leftOffset + '%';
-            panel.style.top = topOffset + '%';
+            panel!.style.left = leftOffset + '%';
+            panel!.style.top = topOffset + '%';
         }
     }, true);
 
@@ -292,9 +325,33 @@ function createPanel() {
 
 
 
-function messageListener(message: any, sender: browser.runtime.MessageSender, sendResponse: ((response?: any) => boolean | void | Promise<any>)) {
+function messageListener(m: any, sender: browser.runtime.MessageSender, sendResponse: ((response?: any) => boolean | void | Promise<any>)) {
 
-    let message_str = <string>message;
+    let message = <MessageFromBackground>m;
+    if (message.settings != null) {
+        page_settings = message.settings;
+    }
+    if (message.pageData != null) {
+        pageData = message.pageData
+        applyPageData();
+    }
+    if (message.pageTimeUpdate != null) {
+        currentPageLimitCount = message.pageTimeUpdate;
+        if (currentTimeOnPage != null) {
+            currentTimeOnPage.innerText = formatDuration(currentPageLimitCount);
+        }
+    }
+    if (message.firefoxTimeUpdate != null) {
+        currentFirefoxLimitCount = message.firefoxTimeUpdate;
+        if (currentTimeFirefox != null) {
+            currentTimeFirefox.innerText = formatDuration(currentFirefoxLimitCount);
+        }
+    }
+
+    if (first && page_settings != null) {
+        createPanel();
+        first = false;
+    }
 
     //         browser.runtime.sendMessage(`volume;${audio.volume}`);
 
@@ -305,5 +362,3 @@ function messageListener(message: any, sender: browser.runtime.MessageSender, se
 }
 
 browser.runtime.onMessage.addListener(messageListener)
-
-createPanel();
