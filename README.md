@@ -27,7 +27,7 @@ Floating Panel (created on every page by this extension) is Both Resizeable and 
   - [x] Static Half transparent
   - Without Extending:
     - [x] Minimize Button
-    - [ ] Current Time On Page
+    - [x] Current Time On Page
     - [ ] Time Left Until Break
     - [ ] Extend Button
   - After Extending:
