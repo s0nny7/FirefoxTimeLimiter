@@ -76,14 +76,28 @@ function style() {
     style.id = "com-limitlost-limiter-style"
 
     style.innerHTML = `
+    //Table Styling
     #com-limitlost-limiter-panel table,#com-limitlost-limiter-panel tr,#com-limitlost-limiter-panel td{
         border:unset;
         outline:unset;
         background-color:unset;
         background:unset;
+        padding:unset;
+        margin:unset;
+    }
+    #com-limitlost-limiter-panel td{
+        font-family: monospace;
+    }
+
+    #com-limitlost-limiter-panel button{
+        font-family: unset;
+        line-height: unset;
+        height: unset;
+        font-size:unset;
     }
 
     #com-limitlost-limiter-panel {
+        font-family: unset;
         color: black;
         display: flex;
         flex-direction: column;
