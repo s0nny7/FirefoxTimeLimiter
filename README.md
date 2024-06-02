@@ -11,7 +11,6 @@ Floating Panel (created on every page by this extension) is Both Resizeable and 
 
 ## Plans
 
-- [ ] Don't count time when page is not up (option in settings to disable this)
 - Time's up Panel
   - [ ] [Auto Pause Videos on Time's Up](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/pause)
   - [ ] [also exit fullscreen](https://developer.mozilla.org/en-US/docs/Web/API/Document/exitFullscreen)
@@ -28,19 +27,20 @@ Floating Panel (created on every page by this extension) is Both Resizeable and 
   - Without Extending:
     - [x] Minimize Button
     - [x] Current Time On Page
-    - [ ] Time Left Until Break
-    - [ ] Extend Button
+    - [x] Time Left Until Break
+    - [x] Extend Button
   - After Extending:
-    - [ ] Disable Animations
+    - [x] Disable Animations
     - [ ] Dark Mode
     - [ ] Show Current Time While Using Firefox
     - [ ] Show Current Time While Using Current Website
-    - [ ] Reset Break Time On This Page Button
+    - [x] Reset Break Time On This Page Button
     - [ ] Set Time Limit In Firefox
     - [ ] Set Time Limit On Pages List
     - [ ] Enable Break Time
     - [ ] Set Break Time for Firefox
     - [ ] Set Break Time List
+    - [ ] Reset Limit Counting after X Hours of Inactivity
     - [ ] Edit Transparency
     - [ ] Edit Background Transparency
 
