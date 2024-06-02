@@ -14,7 +14,15 @@ let currentPageLimitCount: number | null = null
 /**
  * in Milliseconds
  */
+let currentPageBreakTimeLeft: number = -1
+/**
+ * in Milliseconds
+ */
 let currentFirefoxLimitCount: number | null = null
+/**
+ * in Milliseconds
+ */
+let currentFirefoxBreakTimeLeft: number = -1
 
 
 // Drag Panel Variables
@@ -31,6 +39,8 @@ var oldSizeHeight = "";
 var panel: HTMLDivElement | null = null;
 var currentTimeOnPage: HTMLDivElement | null = null;
 var currentTimeFirefox: HTMLDivElement | null = null;
+var currentTimeLeftPage: HTMLDivElement | null = null;
+var currentTimeLeftFirefox: HTMLDivElement | null = null;
 var extended = false;
 
 function applyPageData() {
@@ -223,7 +233,14 @@ function withoutExtendingContent(content: HTMLDivElement) {
     } else {
         row.style.display = "none";
     }
-    table.appendChild(row);
+
+    // Page Time Left Until Break
+    currentTimeLeftPage = createRow("com-limitlost-limiter-website-time-left-row", "Break Starts In:", table, "0.5rem");
+    if (currentPageBreakTimeLeft > 0) {
+        currentTimeLeftPage.innerText = formatDuration(currentPageBreakTimeLeft);
+    } else {
+        currentTimeLeftPage.parentElement!.style.display = "none";
+    }
 
     // Current Time In Firefox
     row = document.createElement("tr");
@@ -240,7 +257,13 @@ function withoutExtendingContent(content: HTMLDivElement) {
     } else {
         row.style.display = "none";
     }
-    table.appendChild(row);
+    // Firefox Time Left Until Break
+    currentTimeLeftFirefox = createRow("com-limitlost-limiter-firefox-time-left-row", "Break Starts In:", table, "0.5rem");
+    if (currentFirefoxBreakTimeLeft > 0) {
+        currentTimeLeftFirefox.innerText = formatDuration(currentFirefoxBreakTimeLeft);
+    } else {
+        currentTimeLeftFirefox.parentElement!.style.display = "none";
+    }
 
     content.appendChild(table);
 
@@ -388,6 +411,34 @@ function messageListener(m: any, sender: browser.runtime.MessageSender, sendResp
         currentFirefoxLimitCount = message.firefoxTimeUpdate;
         if (currentTimeFirefox != null) {
             currentTimeFirefox.innerText = formatDuration(currentFirefoxLimitCount);
+        }
+    }
+    if (message.websiteToBreakTimeLeft != null) {
+        if (currentPageBreakTimeLeft < 0 && message.websiteToBreakTimeLeft > 0 && currentTimeLeftPage != null) {
+            //Unhide Time Left To Break
+            currentTimeLeftPage.parentElement!.style.display = "";
+        }
+        currentPageBreakTimeLeft = message.websiteToBreakTimeLeft;
+        if (currentTimeLeftPage != null) {
+            if (currentPageBreakTimeLeft < 0) {
+                //Hide Time Left To Break
+                currentTimeLeftPage.parentElement!.style.display = "none";
+            }
+            currentTimeLeftPage.innerText = formatDuration(currentPageBreakTimeLeft);
+        }
+    }
+    if (message.firefoxToBreakTimeLeft != null) {
+        if (currentFirefoxBreakTimeLeft < 0 && message.firefoxToBreakTimeLeft > 0 && currentTimeLeftFirefox != null) {
+            //Unhide Time Left To Break
+            currentTimeLeftFirefox.parentElement!.style.display = "";
+        }
+        currentFirefoxBreakTimeLeft = message.firefoxToBreakTimeLeft;
+        if (currentTimeLeftFirefox != null) {
+            if (currentFirefoxBreakTimeLeft < 0) {
+                //Hide Time Left To Break
+                currentTimeLeftFirefox.parentElement!.style.display = "none";
+            }
+            currentTimeLeftFirefox.innerText = formatDuration(currentFirefoxBreakTimeLeft);
         }
     }
 
