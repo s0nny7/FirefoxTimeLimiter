@@ -40,7 +40,8 @@ class MessageForBackground {
 
     //Button Click
     stopBreak: boolean | null = null;
-    resetBreakTime: boolean | null = null;
+    resetTimeCountPage: boolean | null = null;
+    resetTimeCountFirefox: boolean | null = null;
 
     constructor(pageUrl: string) {
         this.pageUrl = pageUrl;
