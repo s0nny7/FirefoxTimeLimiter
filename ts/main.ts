@@ -325,6 +325,33 @@ function createRow(id: string, name: string, parent: HTMLTableElement, padding_b
     return data;
 }
 
+function createCheckBoxRow(name: string, checked: boolean) {
+    let row = document.createElement("label");
+    row.classList.add("com-limitlost-limiter-checkbox-row");
+    row.style.display = "flex";
+    row.style.flexDirection = "row";
+    row.style.gap = "0.5rem";
+    row.style.alignItems = "center";
+
+    let checkbox = document.createElement("input");
+    checkbox.style.display = "none";
+    checkbox.type = "checkbox";
+    checkbox.checked = checked;
+    row.appendChild(checkbox);
+
+    let fakeCheckbox = document.createElement("div");
+    fakeCheckbox.classList.add("com-limitlost-limiter-fake-checkbox");
+
+
+    row.appendChild(fakeCheckbox);
+
+    let nameElement = document.createElement("div");
+    nameElement.innerText = name;
+    row.appendChild(nameElement);
+
+    return row;
+}
+
 function createContent(content: HTMLDivElement) {
     let table = document.createElement("table");
     table.style.border = "none";
@@ -370,8 +397,87 @@ function createContent(content: HTMLDivElement) {
 
     content.appendChild(table);
 
-    // Time Left Until Break
+    //Extended Content Variables
+    let extendedDivParent = document.createElement("div");
+    let extendedDiv = document.createElement("div");
     // Extend Button
+
+    let button = document.createElement("button");
+    button.innerText = "Extend";
+    button.style.width = "100%";
+    button.style.marginBottom = "0.25rem";
+
+    button.onclick = () => {
+        let rect = panel!.getBoundingClientRect()
+        if (extended) {
+            button.innerText = "Extend";
+            panel!.classList.add("transition");
+            extendedDivParent.style.height = "0px";
+
+            panel!.style.height = beforeExtensionHeight + "px";
+        } else {
+            panel!.style.height = rect.height + "px";
+            button.innerText = "Hide";
+            panel!.classList.add("transition");
+            extendedDivParent.style.height = extendedDiv.offsetHeight + "px";
+            panel!.style.height = (beforeExtensionHeight + extendedDiv.offsetHeight) + "px";
+        }
+        extended = !extended;
+    }
+
+    content.appendChild(button);
+
+    // Extended Content
+    extendedDivParent.id = "com-limitlost-limiter-extended-content";
+    extendedDivParent.style.height = extendedDiv.offsetHeight + "px";
+
+    extendedDiv.id = "com-limitlost-limiter-extended-content-internal";
+    extendedDivParent.appendChild(extendedDiv);
+
+    // Save Button
+    saveButton = document.createElement("button");
+    saveButton.innerText = "Save";
+    saveButton.style.width = "100%";
+    saveButton.style.marginBottom = "0.5rem";
+
+    extendedDiv.appendChild(saveButton);
+
+    //Disable Animations
+
+    let row = createCheckBoxRow("Animations", true);
+    row.style.marginBottom = "0.5rem";
+
+    extendedDiv.appendChild(row);
+
+
+    //Reset Time Count On Page Button
+    let resetTimeCountOnPageButton = document.createElement("button");
+    resetTimeCountOnPageButton.innerText = "Reset Page Time Count";
+    resetTimeCountOnPageButton.style.width = "100%";
+    resetTimeCountOnPageButton.onclick = () => {
+        let message = new MessageForBackground(document.URL);
+        message.resetTimeCountPage = true;
+
+        browser.runtime.sendMessage(message);
+    }
+
+    extendedDiv.appendChild(resetTimeCountOnPageButton);
+
+
+    //Reset Break Time On Firefox Button
+    let resetTimeCountOnFirefoxButton = document.createElement("button");
+    resetTimeCountOnFirefoxButton.innerText = "Reset Firefox Time Count";
+    resetTimeCountOnFirefoxButton.style.width = "100%";
+    resetTimeCountOnFirefoxButton.onclick = () => {
+        let message = new MessageForBackground(document.URL);
+        message.resetTimeCountFirefox = true;
+
+        browser.runtime.sendMessage(message);
+    }
+
+    extendedDiv.appendChild(resetTimeCountOnFirefoxButton);
+
+    content.appendChild(extendedDivParent);
 }
 
 
@@ -489,6 +595,7 @@ function createPanel() {
     panel.appendChild(content);
 
     document.body.appendChild(panel);
+    beforeExtensionHeight = panel!.offsetHeight;
 
     panel.style.left = `calc(90% - ${panel.clientWidth}px)`;
 
