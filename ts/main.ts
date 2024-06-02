@@ -42,6 +42,10 @@ var currentTimeFirefox: HTMLDivElement | null = null;
 var currentTimeLeftPage: HTMLDivElement | null = null;
 var currentTimeLeftFirefox: HTMLDivElement | null = null;
 var extended = false;
+var beforeExtensionHeight = 0;
+
+//Extended Content Variables
+var saveButton: HTMLButtonElement | null = null;
 
 function applyPageData() {
     if (panel != null && pageData != null) {
@@ -86,7 +90,7 @@ function style() {
         position: fixed;
         left: 10%;
         top: 10%;
-        resize: both;
+        resize: horizontal;
         z-index: 2147483647;
         border: 1px solid black;
         background-color: rgba(230, 230, 230, 0.8);
@@ -99,6 +103,75 @@ function style() {
     #com-limitlost-limiter-panel.transition{
         transition: width 0.2s, height 0.2s;
     }
+
+    // Button Styling
+    #com-limitlost-limiter-content button{
+        background-color: rgba(225, 225, 225, 1);
+        border: none;
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        text-decoration: none;
+        color:black;
+        box-shadow: 2px 6px 11px 0px rgb(73, 73, 73);
+        font-size:0.9rem;
+    }
+
+    #com-limitlost-limiter-content button:hover{
+        background-color: rgba(215, 215, 215, 1);
+    }
+
+    #com-limitlost-limiter-content button:active{
+        background-color: rgba(205, 205, 205, 1);
+    }
+    //Checkbox Styling
+    .com-limitlost-limiter-fake-checkbox{
+        width: 1rem;
+        height: 1rem;
+        border-radius: 0.5rem;
+        background-color: #ffffffab;
+        display: flex;
+        align-content: center;
+        justify-content: center;
+        padding: 0.3rem;
+    }
+
+    .com-limitlost-limiter-checkbox-row input:hover ~ .com-limitlost-limiter-fake-checkbox{
+        background-color: #ffffffe7;
+    }
+
+    .com-limitlost-limiter-checkbox-row input:checked ~ .com-limitlost-limiter-fake-checkbox{
+        background-color: #191919c7;
+    }
+
+    .com-limitlost-limiter-checkbox-row input:checked:hover ~ .com-limitlost-limiter-fake-checkbox{
+        background-color: #191919e7;
+    }
+
+    .com-limitlost-limiter-fake-checkbox:after {
+        content: "x";
+        display: block;
+        width: fit-content;
+        height: fit-content;
+        font-family: monospace;
+        font-size: 1.5rem;
+        text-align: center;
+        vertical-align: middle;
+        line-height: calc(100% - 0.7rem);
+        color: #aeaeae;
+    }
+
+    .com-limitlost-limiter-checkbox-row input:checked ~ .com-limitlost-limiter-fake-checkbox:after{
+        content: "";
+
+        width: 40%;
+        height: 60%;
+        border: solid white;
+        border-width: 0 3px 3px 0;
+        -webkit-transform: rotate(45deg);
+        -ms-transform: rotate(45deg);
+        transform: rotate(45deg);
+    }
+
     #com-limitlost-limiter-top-bar {
         width: 100%;
         height: 2rem;
@@ -138,9 +211,37 @@ function style() {
         flex-direction: column;
         width: 100%;
         overflow: scroll;
+        overflow-x: hidden;
         flex-grow: 1;
         padding: 0.5rem;
-        width: fit-content;
+        box-sizing:border-box;
+    }
+    #com-limitlost-limiter-extended-content{
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        width: calc(100% + 1rem);
+        height:3rem;
+
+        margin-top: 0.5rem;
+        margin-left: -0.5rem;
+        margin-right: -0.5rem;
+        margin-bottom: -0.5rem;
+
+        border-radius: 0.5rem;
+        border-bottom-right-radius: 0;
+
+        flex-grow: 1;
+        
+        box-shadow: 0px 0px 10px 0px rgb(73, 73, 73);
+
+        overflow: hidden;
+    }
+
+    #com-limitlost-limiter-extended-content-internal{
+        width:100%;
+        padding: 0.5rem;
+        box-sizing: border-box;
     }
     `
 
