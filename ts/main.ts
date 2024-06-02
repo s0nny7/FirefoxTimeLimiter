@@ -308,21 +308,30 @@ function formatDuration(millis: number) {
     return formatted
 }
 
-function withoutExtendingContent(content: HTMLDivElement) {
+function createRow(id: string, name: string, parent: HTMLTableElement, padding_bottom: string = "0.2rem") {
+    let row = document.createElement("tr");
+    row.id = id;
+    let name_obj = document.createElement("td");
+    name_obj.style.paddingBottom = padding_bottom;
+    name_obj.innerText = name;
+    row.appendChild(name_obj);
+    let data = document.createElement("td");
+    data.style.paddingBottom = padding_bottom;
+    data.style.paddingLeft = "0.5rem";
+    row.appendChild(data);
+
+    parent.appendChild(row);
+
+    return data;
+}
+
+function createContent(content: HTMLDivElement) {
     let table = document.createElement("table");
     table.style.border = "none";
     table.style.outline = "none";
 
     // Current Time On Page
-    let row = document.createElement("tr");
-    row.id = "com-limitlost-limiter-website-time-row"
-    let name = document.createElement("td");
-    name.innerText = "Website:";
-    row.appendChild(name);
-
-    currentTimeOnPage = document.createElement("td");
-
-    row.appendChild(currentTimeOnPage);
+    currentTimeOnPage = createRow("com-limitlost-limiter-website-time-row", "Website:", table);
 
     if (page_settings?.showCurrentTimeWebsite) {
         if (currentPageLimitCount != null) {
@@ -332,7 +341,7 @@ function withoutExtendingContent(content: HTMLDivElement) {
         }
 
     } else {
-        row.style.display = "none";
+        currentTimeOnPage.parentElement!.style.display = "none";
     }
 
     // Page Time Left Until Break
@@ -344,19 +353,12 @@ function withoutExtendingContent(content: HTMLDivElement) {
     }
 
     // Current Time In Firefox
-    row = document.createElement("tr");
-    row.id = "com-limitlost-limiter-firefox-time-row"
-    name = document.createElement("td");
-    name.innerText = "Firefox:";
-    row.appendChild(name);
-
-    currentTimeFirefox = document.createElement("td");
-    row.appendChild(currentTimeFirefox)
+    currentTimeFirefox = createRow("com-limitlost-limiter-firefox-time-row", "Firefox: ", table);
 
     if (page_settings?.showCurrentTimeFirefox && currentFirefoxLimitCount != null) {
         currentTimeFirefox.innerText = formatDuration(currentFirefoxLimitCount);
     } else {
-        row.style.display = "none";
+        currentTimeFirefox.parentElement!.style.display = "none";
     }
     // Firefox Time Left Until Break
     currentTimeLeftFirefox = createRow("com-limitlost-limiter-firefox-time-left-row", "Break Starts In:", table, "0.5rem");
@@ -482,7 +484,7 @@ function createPanel() {
     //Content
     content.id = "com-limitlost-limiter-content";
 
-    withoutExtendingContent(content);
+    createContent(content);
 
     panel.appendChild(content);
 
