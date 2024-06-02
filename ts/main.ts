@@ -210,7 +210,7 @@ function style() {
         opacity: 0.5;
     }
     #com-limitlost-limiter-top-bar-button svg {
-        height:100%; 
+        height:1.5rem; 
         aspect-ratio: 1/1;
     }
     #com-limitlost-limiter-top-bar-button svg path {
