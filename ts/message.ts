@@ -48,7 +48,7 @@ class MessageForBackground {
 
     debugReload: boolean | null = null;
 
-    constructor(pageUrl: string) {
+    constructor(pageUrl: string = document.URL) {
         this.pageUrl = pageUrl;
     }
 }
