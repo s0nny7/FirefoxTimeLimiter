@@ -4,6 +4,8 @@
  **/
 var first = true;
 
+var newStyle = false;
+
 //From server and for server variables
 let page_settings: Settings | null = null
 let pageData: PageData | null = null;
@@ -67,11 +69,15 @@ function applyPageData() {
 
 function style() {
 
-    if (document.getElementById("com-limitlost-limiter-style") != null) {
+    let style = <HTMLLinkElement | null>document.getElementById("com-limitlost-limiter-style");
+
+    if (style != null) {
+        newStyle = true;
         return;
     }
 
-    let style = document.createElement("link");
+    style = document.createElement("link");
+
     style.id = "com-limitlost-limiter-style"
 
     style.rel = "stylesheet"
@@ -266,6 +272,15 @@ function createContent(content: HTMLDivElement) {
 
     extendedDiv.id = "com-limitlost-limiter-extended-content-internal";
     extendedDivParent.appendChild(extendedDiv);
+
+    //How To Reload Style Information
+    if (newStyle) {
+        let info = document.createElement("div");
+        info.style.textAlign = "center";
+        info.style.marginBottom = "0.5rem";
+        info.innerText = "Use Ctrl+F5 to see the style changes";
+        extendedDiv.appendChild(info);
+    }
 
     // Save Button
     saveButton = document.createElement("button");
