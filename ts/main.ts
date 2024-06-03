@@ -67,8 +67,17 @@ function applyPageData() {
     }
 }
 
-function style() {
+function style(doc: Document) {
+    let style = doc.createElement("link");
 
+    style.rel = "stylesheet"
+
+    style.href = browser.runtime.getURL("internal.css");
+
+    doc.head.appendChild(style);
+}
+
+async function globalStyle() {
     let style = <HTMLLinkElement | null>document.getElementById("com-limitlost-limiter-style");
 
     if (style != null) {
@@ -82,11 +91,12 @@ function style() {
 
     style.rel = "stylesheet"
 
-    style.href = browser.runtime.getURL("limiter.css");
+    style.href = browser.runtime.getURL("global.css");
 
     document.head.appendChild(style);
+
 }
-style()
+globalStyle()
 
 function iconSvg() {
     return `<svg

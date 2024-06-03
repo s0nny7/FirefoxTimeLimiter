@@ -41,6 +41,7 @@
         }
     ],
     "web_accessible_resources": [
-        "limiter.css"
+        "global.css",
+        "internal.css",
     ]
 }

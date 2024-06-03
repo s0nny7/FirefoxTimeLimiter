@@ -1,54 +1,69 @@
+/* #region General Styling */
+
+html,
+body {
+    background-color: transparent;
+    padding         : 0;
+    margin          : 0;
+    width           : 100%;
+    height          : 100%;
+}
+
+html {
+    color   : black;
+    overflow: hidden;
+}
+
+body {
+    display       : flex;
+    flex-direction: column;
+}
+
+.padding-B-02 {
+    padding-bottom: 0.2rem;
+}
+
+.padding-B-05 {
+    padding-bottom: 0.5rem;
+}
+
+.padding-L-05 {
+    padding-left: 0.5rem;
+}
+
+.margin-B-025 {
+    margin-bottom: 0.25rem;
+}
+
+.margin-B-05 {
+    margin-bottom: 0.5rem;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.space-evenly {
+    justify-content: space-evenly;
+}
+
+.row {
+    display       : flex;
+    flex-direction: row;
+}
+
+/* #endregion */
+
 /* #region Table Styling */
-#com-limitlost-limiter-panel table,
-#com-limitlost-limiter-panel tr,
-#com-limitlost-limiter-panel td {
-    border          : unset;
-    outline         : unset;
-    background-color: unset;
-    background      : unset;
-    padding         : unset;
-    margin          : unset;
-}
-
-#com-limitlost-limiter-panel td {
+#panel td {
     font-family: monospace;
-}
-
-#com-limitlost-limiter-panel button {
-    font-family: unset;
-    line-height: unset;
-    height     : unset;
-    font-size  : unset;
-}
-
-#com-limitlost-limiter-panel {
-    font-family               : unset;
-    color                     : black;
-    display                   : flex;
-    flex-direction            : column;
-    position                  : fixed;
-    left                      : 10%;
-    top                       : 10%;
-    resize                    : horizontal;
-    z-index                   : 2147483647;
-    border                    : 1px solid black;
-    background-color          : rgba(230, 230, 230, 0.8);
-    overflow                  : hidden;
-    min-height                : 2rem;
-    min-width                 : 3rem;
-    border-radius             : 0.5rem;
-    border-bottom-right-radius: 0;
-}
-
-#com-limitlost-limiter-panel.transition {
-    transition: width 0.2s, height 0.2s;
 }
 
 /* #endregion */
 
 /* #region Button Styling */
 
-#com-limitlost-limiter-content button {
+#content button {
     background-color: rgba(225, 225, 225, 1);
     border          : none;
     border-radius   : 0.5rem;
@@ -59,18 +74,29 @@
     font-size       : 0.9rem;
 }
 
-#com-limitlost-limiter-content button:hover {
+#content button:hover {
     background-color: rgba(215, 215, 215, 1);
 }
 
-#com-limitlost-limiter-content button:active {
+#content button:active {
     background-color: rgba(205, 205, 205, 1);
 }
 
 /* #endregion */
 
 /* #region Checkbox Styling */
-.com-limitlost-limiter-fake-checkbox {
+.checkbox-row {
+    display       : flex;
+    flex-direction: row;
+    gap           : 0.5rem;
+    align-items   : center;
+}
+
+.checkbox-row input {
+    display: none;
+}
+
+.fake-checkbox {
     width           : 1rem;
     height          : 1rem;
     border-radius   : 0.5rem;
@@ -82,27 +108,27 @@
     box-shadow      : 2px 2px 10px 0px rgb(73, 73, 73);
 }
 
-.com-limitlost-limiter-checkbox-row input:hover~.com-limitlost-limiter-fake-checkbox {
+.checkbox-row input:hover~.fake-checkbox {
     background-color: rgb(215, 215, 215);
 }
 
-.com-limitlost-limiter-checkbox-row input:active~.com-limitlost-limiter-fake-checkbox {
+.checkbox-row input:active~.fake-checkbox {
     background-color: rgb(205, 205, 205);
 }
 
-.com-limitlost-limiter-checkbox-row input:checked~.com-limitlost-limiter-fake-checkbox {
+.checkbox-row input:checked~.fake-checkbox {
     background-color: rgb(33, 33, 33);
 }
 
-.com-limitlost-limiter-checkbox-row input:checked:hover~.com-limitlost-limiter-fake-checkbox {
+.checkbox-row input:checked:hover~.fake-checkbox {
     background-color: rgb(59, 59, 59);
 }
 
-.com-limitlost-limiter-checkbox-row input:checked:active~.com-limitlost-limiter-fake-checkbox {
+.checkbox-row input:checked:active~.fake-checkbox {
     background-color: rgb(73, 73, 73);
 }
 
-.com-limitlost-limiter-fake-checkbox:after {
+.fake-checkbox:after {
     content    : "x";
     display    : block;
     width      : fit-content;
@@ -114,7 +140,7 @@
     color      : #aeaeae;
 }
 
-.com-limitlost-limiter-checkbox-row input:checked~.com-limitlost-limiter-fake-checkbox:after {
+.checkbox-row input:checked~.fake-checkbox:after {
     content: "";
 
     width            : 40%;
@@ -129,7 +155,7 @@
 /* #endregion */
 
 /* #region Top Bar Styling */
-#com-limitlost-limiter-top-bar {
+#top-bar {
     width           : 100%;
     height          : 2rem;
     background-color: rgba(255, 255, 255, 0.8);
@@ -139,7 +165,7 @@
     box-sizing      : border-box;
 }
 
-#com-limitlost-limiter-top-bar-button {
+#top-bar-button {
     height          : 100%;
     aspect-ratio    : 1/1;
     background-color: transparent;
@@ -148,20 +174,20 @@
     text-decoration : none;
 }
 
-#com-limitlost-limiter-top-bar-button:hover {
+#top-bar-button:hover {
     opacity: 0.7;
 }
 
-#com-limitlost-limiter-top-bar-button:active {
+#top-bar-button:active {
     opacity: 0.5;
 }
 
-#com-limitlost-limiter-top-bar-button svg {
+#top-bar-button svg {
     height      : 1.5rem;
     aspect-ratio: 1/1;
 }
 
-#com-limitlost-limiter-top-bar-button svg path {
+#top-bar-button svg path {
     height      : 100%;
     aspect-ratio: 1/1;
     color       : #000000 !important;
@@ -172,7 +198,7 @@
 /* #endregion */
 
 /* #region Content Styling */
-#com-limitlost-limiter-content {
+#content {
     display       : flex;
     flex-direction: column;
     width         : 100%;
@@ -183,7 +209,7 @@
     box-sizing    : border-box;
 }
 
-#com-limitlost-limiter-extended-content {
+#extended-content {
     display       : flex;
     flex-direction: column;
     box-sizing    : border-box;
@@ -205,7 +231,7 @@
     overflow: hidden;
 }
 
-#com-limitlost-limiter-extended-content-internal {
+#extended-content-internal {
     width     : 100%;
     padding   : 0.5rem;
     box-sizing: border-box;

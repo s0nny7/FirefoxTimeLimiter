@@ -1,0 +1,38 @@
+#com-limitlost-limiter-panel {
+    flex-grow: 1 !important;
+    margin   : 0 !important;
+    padding  : 0 !important;
+    border   : 0 !important;
+
+    background-color          : rgba(230, 230, 230, 0.8) !important;
+    overflow                  : hidden !important;
+    min-height                : 2rem !important;
+    min-width                 : 3rem !important;
+    border-radius             : 0.5rem !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+#com-limitlost-limiter-panel-container {
+    position: fixed !important;
+    left    : 10% !important;
+    top     : 10% !important;
+    z-index : 2147483647 !important;
+
+    border: 1px solid black !important;
+
+    display : flex !important;
+    margin  : 0 !important;
+    padding : 0 !important;
+    resize  : horizontal !important;
+    overflow: hidden !important;
+
+    min-height: 2rem !important;
+    min-width : 3rem !important;
+
+    border-radius             : 0.5rem !important;
+    border-bottom-right-radius: 0 !important;
+}
+
+#com-limitlost-limiter-panel-container.com-limitlost-limiter-transition {
+    transition: width 0.2s, height 0.2s !important;
+}
