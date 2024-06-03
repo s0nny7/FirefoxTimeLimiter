@@ -85,7 +85,6 @@ async function globalStyle() {
     let style = <HTMLLinkElement | null>document.getElementById("com-limitlost-limiter-style");
 
     if (style != null) {
-        newStyle = true;
         return;
     }
 
