@@ -1,4 +1,4 @@
-/* Table Styling */
+/* #region Table Styling */
 #com-limitlost-limiter-panel table,
 #com-limitlost-limiter-panel tr,
 #com-limitlost-limiter-panel td {
@@ -44,7 +44,10 @@
     transition: width 0.2s, height 0.2s;
 }
 
-/* Button Styling */
+/* #endregion */
+
+/* #region Button Styling */
+
 #com-limitlost-limiter-content button {
     background-color: rgba(225, 225, 225, 1);
     border          : none;
@@ -64,7 +67,9 @@
     background-color: rgba(205, 205, 205, 1);
 }
 
-/* Checkbox Styling */
+/* #endregion */
+
+/* #region Checkbox Styling */
 .com-limitlost-limiter-fake-checkbox {
     width           : 1rem;
     height          : 1rem;
@@ -112,7 +117,9 @@
     transform        : rotate(45deg);
 }
 
-/* Top Bar Styling */
+/* #endregion */
+
+/* #region Top Bar Styling */
 #com-limitlost-limiter-top-bar {
     width           : 100%;
     height          : 2rem;
@@ -153,7 +160,9 @@
     stroke      : #000000 !important;
 }
 
-/* Content Styling */
+/* #endregion */
+
+/* #region Content Styling */
 #com-limitlost-limiter-content {
     display       : flex;
     flex-direction: column;
@@ -192,3 +201,5 @@
     padding   : 0.5rem;
     box-sizing: border-box;
 }
+
+/* #endregion */
