@@ -9,6 +9,12 @@ Floating Panel (created on every page by this extension) is Both Resizeable and 
 - TODO Without Extending Screenshot
 - TODO With Extending Screenshot
 
+## Development
+
+### Enabling Debug Mode
+
+Add `"browsingData"` permission to the list in [manifest.json](/src/manifest.json)
+
 ## Plans
 
 - Time's up Panel

@@ -28,6 +28,9 @@ class MessageFromBackground {
      */
     breakEnd: number | null = null;
 
+    //Special Requests
+    alert: string | null = null;
+
     constructor() {
     }
 }
@@ -42,6 +45,8 @@ class MessageForBackground {
     stopBreak: boolean | null = null;
     resetTimeCountPage: boolean | null = null;
     resetTimeCountFirefox: boolean | null = null;
+
+    debugReload: boolean | null = null;
 
     constructor(pageUrl: string) {
         this.pageUrl = pageUrl;

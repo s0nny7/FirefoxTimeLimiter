@@ -4,8 +4,6 @@
  **/
 var first = true;
 
-var newStyle = false;
-
 //From server and for server variables
 let page_settings: Settings | null = null
 let pageData: PageData | null = null;
@@ -274,22 +272,17 @@ function createContent(content: HTMLDivElement) {
         extended = !extended;
     }
 
-    content.appendChild(button);
+    //Debug: Reload Button
+    let reloadButton = panelDocument.getElementById("reload-button")!
+    if (page_settings?.debugMode) {
+        reloadButton.onclick = () => {
+            let message = new MessageForBackground();
+            message.debugReload = true;
 
-    // Extended Content
-    extendedDivParent.id = "com-limitlost-limiter-extended-content";
-    extendedDivParent.style.height = extendedDiv.offsetHeight + "px";
-
-    extendedDiv.id = "com-limitlost-limiter-extended-content-internal";
-    extendedDivParent.appendChild(extendedDiv);
-
-    //How To Reload Style Information
-    if (newStyle) {
-        let info = document.createElement("div");
-        info.style.textAlign = "center";
-        info.style.marginBottom = "0.5rem";
-        info.innerText = "Use Ctrl+F5 to see the style changes";
-        extendedDiv.appendChild(info);
+            browser.runtime.sendMessage(message);
+        }
+    } else {
+        reloadButton.style.display = "none";
     }
 
     // Save Button
@@ -508,6 +501,10 @@ function messageListener(m: any, sender: browser.runtime.MessageSender, sendResp
             }
             currentTimeLeftFirefox.innerText = formatDuration(currentFirefoxBreakTimeLeft);
         }
+    }
+
+    if (message.alert) {
+        alert(message.alert)
     }
 
     if (first && page_settings != null) {

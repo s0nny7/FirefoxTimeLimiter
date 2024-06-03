@@ -29,6 +29,8 @@ class PageBreakData {
 
 class Settings {
 
+    debugMode: boolean | null = null;
+
     generalPageData: Map<string, PageData> | null = null;
 
     updateTimerPerMiliseconds: number | null = null;
@@ -47,7 +49,9 @@ class Settings {
     constructor() {
     }
 
-    default() {
+    async default() {
+        this.debugMode = this.debugMode ?? await browser.permissions.contains({ permissions: ["browsingData"] });
+
         this.generalPageData = this.generalPageData ?? new Map();
         this.updateTimerPerMiliseconds = this.updateTimerPerMiliseconds ?? 100;
         this.animations = this.animations ?? true;
@@ -96,7 +100,7 @@ class Settings {
         this.transparency = saved["transparency"];
         this.backgroundTransparency = saved["backgroundTransparency"];
 
-        this.default()
+        await this.default()
     }
 
     save() {
