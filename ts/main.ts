@@ -36,11 +36,17 @@ var oldSizeHeight = "";
 
 
 
-var panel: HTMLDivElement | null = null;
-var currentTimeOnPage: HTMLDivElement | null = null;
-var currentTimeFirefox: HTMLDivElement | null = null;
-var currentTimeLeftPage: HTMLDivElement | null = null;
-var currentTimeLeftFirefox: HTMLDivElement | null = null;
+let panelContainer: HTMLDivElement | null = null;
+var panel: HTMLIFrameElement | null = null;
+var currentTimeOnPage: HTMLTableCellElement | null = null;
+var currentTimeOnPageRow: HTMLTableRowElement | null = null;
+var currentTimeFirefox: HTMLTableCellElement | null = null;
+var currentTimeFirefoxRow: HTMLTableRowElement | null = null;
+var currentTimeLeftPage: HTMLTableCellElement | null = null;
+var currentTimeLeftPageRow: HTMLTableRowElement | null = null;
+var currentTimeLeftFirefox: HTMLTableCellElement | null = null;
+var currentTimeLeftFirefoxRow: HTMLTableRowElement | null = null;
+
 var extended = false;
 var beforeExtensionHeight = 0;
 
@@ -155,57 +161,12 @@ function formatDuration(millis: number) {
     return formatted
 }
 
-function createRow(id: string, name: string, parent: HTMLTableElement, padding_bottom: string = "0.2rem") {
-    let row = document.createElement("tr");
-    row.id = id;
-    let name_obj = document.createElement("td");
-    name_obj.style.paddingBottom = padding_bottom;
-    name_obj.innerText = name;
-    row.appendChild(name_obj);
-    let data = document.createElement("td");
-    data.style.paddingBottom = padding_bottom;
-    data.style.paddingLeft = "0.5rem";
-    row.appendChild(data);
-
-    parent.appendChild(row);
-
-    return data;
-}
-
-function createCheckBoxRow(name: string, checked: boolean) {
-    let row = document.createElement("label");
-    row.classList.add("com-limitlost-limiter-checkbox-row");
-    row.style.display = "flex";
-    row.style.flexDirection = "row";
-    row.style.gap = "0.5rem";
-    row.style.alignItems = "center";
-
-    let checkbox = document.createElement("input");
-    checkbox.style.display = "none";
-    checkbox.type = "checkbox";
-    checkbox.checked = checked;
-    row.appendChild(checkbox);
-
-    let fakeCheckbox = document.createElement("div");
-    fakeCheckbox.classList.add("com-limitlost-limiter-fake-checkbox");
-
-
-    row.appendChild(fakeCheckbox);
-
-    let nameElement = document.createElement("div");
-    nameElement.innerText = name;
-    row.appendChild(nameElement);
-
-    return row;
-}
-
-function createContent(content: HTMLDivElement) {
-    let table = document.createElement("table");
-    table.style.border = "none";
-    table.style.outline = "none";
+function createContent() {
+    let panelDocument = panel!.contentWindow!.document;
 
     // Current Time On Page
-    currentTimeOnPage = createRow("com-limitlost-limiter-website-time-row", "Website:", table);
+    currentTimeOnPage = <HTMLTableCellElement>panelDocument.getElementById("current-time-on-page")!;
+    currentTimeOnPageRow = <HTMLTableRowElement>currentTimeOnPage.parentElement!;
 
     if (page_settings?.showCurrentTimeWebsite) {
         if (currentPageLimitCount != null) {
@@ -215,59 +176,60 @@ function createContent(content: HTMLDivElement) {
         }
 
     } else {
-        currentTimeOnPage.parentElement!.style.display = "none";
+        currentTimeOnPageRow.style.display = "none";
     }
 
     // Page Time Left Until Break
-    currentTimeLeftPage = createRow("com-limitlost-limiter-website-time-left-row", "Break Starts In:", table, "0.5rem");
+    currentTimeLeftPage = <HTMLTableCellElement>panelDocument.getElementById("current-time-left-on-page")!;
+    currentTimeLeftPageRow = <HTMLTableRowElement>currentTimeLeftPage.parentElement!;
+
     if (currentPageBreakTimeLeft > 0) {
         currentTimeLeftPage.innerText = formatDuration(currentPageBreakTimeLeft);
     } else {
-        currentTimeLeftPage.parentElement!.style.display = "none";
+        currentTimeLeftPageRow.style.display = "none";
     }
 
     // Current Time In Firefox
-    currentTimeFirefox = createRow("com-limitlost-limiter-firefox-time-row", "Firefox: ", table);
+    currentTimeFirefox = <HTMLTableCellElement>panelDocument.getElementById("current-time-on-firefox")!;
+    currentTimeFirefoxRow = <HTMLTableRowElement>currentTimeFirefox.parentElement!;
 
     if (page_settings?.showCurrentTimeFirefox && currentFirefoxLimitCount != null) {
         currentTimeFirefox.innerText = formatDuration(currentFirefoxLimitCount);
     } else {
         currentTimeFirefox.parentElement!.style.display = "none";
     }
+
     // Firefox Time Left Until Break
-    currentTimeLeftFirefox = createRow("com-limitlost-limiter-firefox-time-left-row", "Break Starts In:", table, "0.5rem");
+    currentTimeLeftFirefox = <HTMLTableCellElement>panelDocument.getElementById("current-time-left-on-firefox")!
+    currentTimeLeftFirefoxRow = <HTMLTableRowElement>currentTimeLeftFirefox.parentElement!;
+
     if (currentFirefoxBreakTimeLeft > 0) {
         currentTimeLeftFirefox.innerText = formatDuration(currentFirefoxBreakTimeLeft);
     } else {
-        currentTimeLeftFirefox.parentElement!.style.display = "none";
+        currentTimeLeftFirefoxRow.style.display = "none";
     }
 
-    content.appendChild(table);
-
     //Extended Content Variables
-    let extendedDivParent = document.createElement("div");
-    let extendedDiv = document.createElement("div");
+    let extendedDivParent = panelDocument.createElement("extended-content");
+    let extendedDiv = panelDocument.getElementById("extended-content-internal")!;
     // Extend Button
 
-    let button = document.createElement("button");
-    button.innerText = "Extend";
-    button.style.width = "100%";
-    button.style.marginBottom = "0.25rem";
+    let extendButton = panelDocument.getElementById("extend-button")!;
 
-    button.onclick = () => {
-        let rect = panel!.getBoundingClientRect()
+    extendButton.onclick = () => {
+        let rect = panelContainer!.getBoundingClientRect()
         if (extended) {
-            button.innerText = "Extend";
-            panel!.classList.add("transition");
-            extendedDivParent.style.height = "0px";
+            extendButton.innerText = "Extend";
+            panelContainer!.classList.add("com-limitlost-limiter-transition");
+            extendedDivParent.style.setProperty("height", "0px", "important");
 
-            panel!.style.height = beforeExtensionHeight + "px";
+            panelContainer!.style.setProperty("height", beforeExtensionHeight + "px", "important");
         } else {
-            panel!.style.height = rect.height + "px";
-            button.innerText = "Hide";
-            panel!.classList.add("transition");
-            extendedDivParent.style.height = extendedDiv.offsetHeight + "px";
-            panel!.style.height = (beforeExtensionHeight + extendedDiv.offsetHeight) + "px";
+            panelContainer!.style.height = rect.height + "px";
+            extendButton.innerText = "Hide";
+            panelContainer!.classList.add("com-limitlost-limiter-transition");
+            extendedDivParent.style.setProperty("height", extendedDiv.offsetHeight + "px", "important");
+            panelContainer!.style.setProperty("height", beforeExtensionHeight + extendedDiv.offsetHeight + "px", "important");
         }
         extended = !extended;
     }
@@ -286,25 +248,17 @@ function createContent(content: HTMLDivElement) {
     }
 
     // Save Button
-    saveButton = document.createElement("button");
-    saveButton.innerText = "Save";
-    saveButton.style.width = "100%";
-    saveButton.style.marginBottom = "0.5rem";
-
-    extendedDiv.appendChild(saveButton);
+    saveButton = <HTMLButtonElement>panelDocument.getElementById("save-button")!;
 
     //Disable Animations
+    //TODO Setup Action
 
-    let row = createCheckBoxRow("Animations", true);
-    row.style.marginBottom = "0.5rem";
-
-    extendedDiv.appendChild(row);
+    //Dark Mode
+    //TODO Setup Action
 
 
     //Reset Time Count On Page Button
-    let resetTimeCountOnPageButton = document.createElement("button");
-    resetTimeCountOnPageButton.innerText = "Reset Page Time Count";
-    resetTimeCountOnPageButton.style.width = "100%";
+    let resetTimeCountOnPageButton = panelDocument.getElementById("reset-page-time")!;
     resetTimeCountOnPageButton.onclick = () => {
         let message = new MessageForBackground(document.URL);
         message.resetTimeCountPage = true;
@@ -312,13 +266,9 @@ function createContent(content: HTMLDivElement) {
         browser.runtime.sendMessage(message);
     }
 
-    extendedDiv.appendChild(resetTimeCountOnPageButton);
-
 
     //Reset Break Time On Firefox Button
-    let resetTimeCountOnFirefoxButton = document.createElement("button");
-    resetTimeCountOnFirefoxButton.innerText = "Reset Firefox Time Count";
-    resetTimeCountOnFirefoxButton.style.width = "100%";
+    let resetTimeCountOnFirefoxButton = panelDocument.getElementById("reset-firefox-time")!;
     resetTimeCountOnFirefoxButton.onclick = () => {
         let message = new MessageForBackground(document.URL);
         message.resetTimeCountFirefox = true;
@@ -326,129 +276,136 @@ function createContent(content: HTMLDivElement) {
         browser.runtime.sendMessage(message);
     }
 
-    extendedDiv.appendChild(resetTimeCountOnFirefoxButton);
-
-    content.appendChild(extendedDivParent);
+    extendedDivParent.style.height = extendedDiv.offsetHeight + "px";
 }
 
 
-function createPanel() {
-    let old = document.getElementById("com-limitlost-limiter-panel")
+async function createPanel() {
+
+    let old = document.getElementById("com-limitlost-limiter-panel-container")
     //Remove Old Panel If it Already Exists
     if (old != null) {
         old.remove();
     }
 
+    panelContainer = document.createElement("div");
+    panelContainer.id = "com-limitlost-limiter-panel-container"
+
     //Add Static limiter panel above everything
-    panel = document.createElement("div");
+    panel = document.createElement("iframe");
+
+    panel.onload = () => {
+        let innerWindow = panel!.contentWindow!
+        let innerDocument = innerWindow.document
+
+        style(innerDocument);
+
+        let topBar = innerDocument.getElementById("top-bar")!;
+
+        //Drag Panel Events
+        topBar.addEventListener('mousedown', function (e) {
+            if (e.button != 0) {
+                return;
+            }
+            isDown = true;
+            offset = [
+                panelContainer!.offsetLeft - e.screenX,
+                panelContainer!.offsetTop - e.screenY
+            ];
+        }, true);
+
+        function mouseUp() {
+            isDown = false;
+        }
+
+        function mouseMove(event: MouseEvent) {
+            if (isDown) {
+
+                let leftOffsetPx = event.screenX + offset[0];
+                let topOffsetPx = event.screenY + offset[1];
+
+                let leftOffset;
+                //Left Bounds check
+                if (leftOffsetPx + panel!.offsetWidth > window.innerWidth) {
+                    leftOffset = (window.innerWidth - panelContainer!.offsetWidth) / window.innerWidth * 100
+                } else if (leftOffsetPx < 0) {
+                    leftOffset = 0
+                } else {
+                    leftOffset = leftOffsetPx / window.innerWidth * 100
+                }
+
+
+                let topOffset;
+                //Top bounds check
+                if (topOffsetPx + panelContainer!.offsetHeight > window.innerHeight) {
+                    topOffsetPx = (window.innerHeight - panelContainer!.offsetHeight) / window.innerHeight * 100
+                } else if (topOffsetPx < 0) {
+                    topOffset = 0
+                } else {
+                    topOffset = topOffsetPx / window.innerHeight * 100
+                }
+
+
+                panelContainer!.style.setProperty("left", leftOffset + '%', "important");
+                panelContainer!.style.setProperty("top", topOffset + '%', "important");
+            }
+        }
+
+        document.addEventListener('mouseup', mouseUp, true);
+
+        innerDocument.addEventListener('mouseup', function () {
+            isDown = false;
+        }, true);
+
+        innerDocument.addEventListener('mousemove', mouseMove, true);
+
+        let topBarButton = innerDocument.getElementById("top-bar-button")!;
+        topBarButton.onclick = function () {
+            if (!minimized) {
+                if (panelContainer!.style.width == "") {
+                    panelContainer!.style.setProperty("width", innerWindow.innerWidth + "px", "important");
+                }
+                if (panelContainer!.style.height == "") {
+                    panelContainer!.style.setProperty("height", innerWindow.innerHeight + "px", "important");
+                }
+                panelContainer!.classList.add("com-limitlost-limiter-transition");
+                oldSizeWidth = panelContainer!.style.width;
+                oldSizeHeight = panelContainer!.style.height;
+                panelContainer!.style.setProperty("width", "0px", "important");
+                panelContainer!.style.setProperty("height", "0px", "important");
+                panelContainer!.style.setProperty("resize", "none", "important");
+            } else {
+                panelContainer!.classList.add("com-limitlost-limiter-transition");
+                panelContainer!.style.setProperty("width", oldSizeWidth, "important");
+                panelContainer!.style.setProperty("height", oldSizeHeight, "important");
+                panelContainer!.style.resize = "";
+            }
+
+
+            minimized = !minimized
+        }
+
+        createContent();
+
+        beforeExtensionHeight = innerWindow.innerHeight;
+        panelContainer!.style.setProperty("left", `calc(90% - ${panel!.clientWidth}px)`, "important");
+        panelContainer!.style.setProperty("height", beforeExtensionHeight + "px", "important");
+        panelContainer!.style.setProperty("width", `${innerWindow.innerWidth}px`, "important");
+    }
+
+    panelContainer.appendChild(panel);
+    document.body.appendChild(panelContainer);
+
+    panel.src = browser.runtime.getURL("panel.html");
+
     panel.id = "com-limitlost-limiter-panel";
 
     //Remove transition class when resizing
-    panel.addEventListener('mousedown', function (e) {
-        if (e.target == panel) {
-            panel!.classList.remove("transition")
+    panelContainer.addEventListener('mousedown', function (e) {
+        if (e.target == panelContainer) {
+            panelContainer!.classList.remove("com-limitlost-limiter-transition")
         }
     });
-
-    //Create Elements Inside of Panel
-    let content = document.createElement("div");
-    let topBar = document.createElement("div");
-
-    //Top Bar
-    topBar.id = "com-limitlost-limiter-top-bar"
-
-    let topBarButton = document.createElement("button");
-    topBarButton.id = "com-limitlost-limiter-top-bar-button"
-    topBarButton.innerHTML = iconSvg();
-
-    topBarButton.onclick = function () {
-        if (!minimized) {
-            if (panel!.style.width == "") {
-                panel!.style.width = panel!.offsetWidth + "px"
-            }
-            if (panel!.style.height == "") {
-                panel!.style.height = panel!.offsetHeight + "px"
-            }
-            panel!.classList.add("transition");
-            oldSizeWidth = panel!.style.width;
-            oldSizeHeight = panel!.style.height;
-            panel!.style.width = "0px";
-            panel!.style.height = "0px";
-            panel!.style.resize = "none";
-        } else {
-            panel!.classList.add("transition");
-            panel!.style.width = oldSizeWidth;
-            panel!.style.height = oldSizeHeight;
-            panel!.style.resize = "";
-        }
-
-
-        minimized = !minimized
-    }
-
-    topBar.appendChild(topBarButton);
-
-    //Drag Panel Events
-    topBar.addEventListener('mousedown', function (e) {
-        if (e.button != 0) {
-            return;
-        }
-        isDown = true;
-        offset = [
-            panel!.offsetLeft - e.clientX,
-            panel!.offsetTop - e.clientY
-        ];
-    }, true);
-
-    document.addEventListener('mouseup', function () {
-        isDown = false;
-    }, true);
-
-    document.addEventListener('mousemove', function (event) {
-        if (isDown) {
-            let leftOffsetPx = event.clientX + offset[0];
-            let topOffsetPx = event.clientY + offset[1];
-
-            let leftOffset;
-            //Left Bounds check
-            if (leftOffsetPx + panel!.offsetWidth > window.innerWidth) {
-                leftOffset = (window.innerWidth - panel!.offsetWidth) / window.innerWidth * 100
-            } else if (leftOffsetPx < 0) {
-                leftOffset = 0
-            } else {
-                leftOffset = leftOffsetPx / window.innerWidth * 100
-            }
-
-
-            let topOffset;
-            //Top bounds check
-            if (topOffsetPx + panel!.offsetHeight > window.innerHeight) {
-                topOffsetPx = (window.innerHeight - panel!.offsetHeight) / window.innerHeight * 100
-            } else if (topOffsetPx < 0) {
-                topOffset = 0
-            } else {
-                topOffset = topOffsetPx / window.innerHeight * 100
-            }
-
-
-            panel!.style.left = leftOffset + '%';
-            panel!.style.top = topOffset + '%';
-        }
-    }, true);
-
-    panel.appendChild(topBar);
-
-    //Content
-    content.id = "com-limitlost-limiter-content";
-
-    createContent(content);
-
-    panel.appendChild(content);
-
-    document.body.appendChild(panel);
-    beforeExtensionHeight = panel!.offsetHeight;
-
-    panel.style.left = `calc(90% - ${panel.clientWidth}px)`;
 
 }
 

@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="color-scheme" content="light dark">
+</head>
+
+<body>
+    <div id="top-bar">
+        <button id="top-bar-button">
+            <svg viewBox="0 0 24 24" fill="none" version="1.1" id="svg3" xmlns="http://www.w3.org/2000/svg"
+                xmlns:svg="http://www.w3.org/2000/svg">
+                <defs id="defs3" />
+                <path
+                    style="stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-width:0.77043;stroke-dasharray:none;paint-order:normal;fill-opacity:1;stroke-dashoffset:0"
+                    d="m 12,2.25 c -5.3758852,0 -9.75,4.3741148 -9.75,9.75 0,5.375922 4.3741188,9.75 9.75,9.75 5.375918,0 9.75,-4.374082 9.75,-9.75 0,-5.3758812 -4.374078,-9.75 -9.75,-9.75 z m 0,1.5 c 4.565268,0 8.25,3.6847711 8.25,8.25 0,4.565272 -3.684728,8.25 -8.25,8.25 C 7.4347711,20.25 3.75,16.565268 3.75,12 3.75,7.4347752 7.4347752,3.75 12,3.75 Z"
+                    id="path1" />
+                <path id="path2"
+                    style="stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;stroke-width:0.77043;stroke-dasharray:none;paint-order:normal;fill-opacity:1;stroke-dashoffset:0"
+                    d="M 12 5.25 A 0.75 0.75 0 0 0 11.25 6 L 11.25 11.98623 A 0.75 0.75 0 0 0 11.46873 12.53127 L 15.708984 16.769531 A 0.75 0.75 0 0 0 16.769531 16.769531 A 0.75 0.75 0 0 0 16.769531 15.708984 L 12.75 11.687578 L 12.75 6 A 0.75 0.75 0 0 0 12 5.25 z " />
+            </svg>
+        </button>
+    </div>
+    <div id="content">
+        <table>
+            <tr>
+                <td class="padding-B-02">Website:</td>
+                <td id="current-time-on-page" class="padding-B-02 padding-L-05">00:00:0</td>
+            </tr>
+            <tr>
+                <td class="padding-B-05">Break Starts In:</td>
+                <td id="current-time-left-on-page" class="padding-B-05 padding-L-05">00:00:0</td>
+            </tr>
+            <tr>
+                <td class="padding-B-02">Firefox:</td>
+                <td id="current-time-on-firefox" class="padding-B-02 padding-L-05">00:00:0</td>
+            </tr>
+            <tr>
+                <td class="padding-B-05">Break Starts In:</td>
+                <td id="current-time-left-on-firefox" class="padding-B-05 padding-L-05">00:00:0</td>
+        </table>
+        <button class="margin-B-025 full-width" id="extend-button">Extend</button>
+        <div id="extended-content">
+            <div id="extended-content-internal">
+                <button id="reload-button" class="margin-B-025 full-width">Debug: Update Resources</button>
+                <button id="save-button" class="margin-B-05 full-width">Save</button>
+                <div class="row margin-B-05 full-width space-evenly">
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="animations-checkbox">
+                        <div class="fake-checkbox"></div>
+                        <div>Animations</div>
+                    </label>
+                    <label class="checkbox-row">
+                        <input type="checkbox" id="dark-mode-checkbox">
+                        <div class="fake-checkbox"></div>
+                        <div>Dark Mode</div>
+                    </label>
+                </div>
+                <button id="reset-page-time" class="full-width">Reset Page Time Count</button>
+                <button id="reset-firefox-time" class="margin-B-025 full-width">Reset Firefox Time Count</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
