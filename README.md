@@ -47,8 +47,8 @@ Add `"browsingData"` permission to the list in [manifest.json](/src/manifest.jso
     - [ ] Set Break Time for Firefox
     - [ ] Set Break Time List
     - [ ] Reset Limit Counting after X Hours of Inactivity
-    - [ ] Edit Transparency
-    - [ ] Edit Background Transparency
+    - [x] Edit Transparency
+    - [x] Edit Background Transparency
 
 ## License
 

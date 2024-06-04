@@ -62,6 +62,8 @@ var currentTimeLeftFirefoxRow: HTMLTableRowElement | null = null;
 var animationsCheckBox: HTMLInputElement | null = null;
 var darkModeCheckBox: HTMLInputElement | null = null;
 var fixTransparencyCheckBox: HTMLInputElement | null = null;
+var transparencySlider: HTMLInputElement | null = null;
+var backgroundTransparencySlider: HTMLInputElement | null = null;
 
 var extended = false;
 var beforeExtensionHeight = 0;
@@ -126,6 +128,13 @@ function applySettings() {
 
         darkModeCheckBox!.checked = page_settings.darkMode!;
         panelDocument!.body.parentElement!.classList.toggle("dark-mode", page_settings!.darkMode!);
+
+        transparencySlider!.value = (page_settings.transparency! * 100).toString();
+        panelContainer!.style.setProperty("opacity", page_settings.transparency!.toString(), "important");
+
+        backgroundTransparencySlider!.value = (page_settings.backgroundTransparency! * 100).toString();
+        panelDocument!.body.parentElement!.style.setProperty("--background-opacity", page_settings.backgroundTransparency!.toString());
+
         saveNotNeeded();
     }
 }
@@ -365,6 +374,22 @@ function createContent() {
 
         browser.runtime.sendMessage(message);
     }
+
+    //Transparency Slider
+    transparencySlider = <HTMLInputElement>panelDocument.getElementById("transparency-slider")!;
+    transparencySlider.onchange = () => {
+        saveNeeded();
+        page_settings!.transparency = parseFloat(transparencySlider!.value) / 100;
+        panelContainer!.style.setProperty("opacity", page_settings!.transparency.toString(), "important");
+    }
+    //Background Transparency Slider
+    backgroundTransparencySlider = <HTMLInputElement>panelDocument.getElementById("background-transparency-slider")!;
+    backgroundTransparencySlider.onchange = () => {
+        saveNeeded();
+        page_settings!.backgroundTransparency = parseFloat(backgroundTransparencySlider!.value) / 100;
+        panelDocument!.body.parentElement!.style.setProperty("--background-opacity", page_settings!.backgroundTransparency.toString());
+    }
+
 
     applySettings();
     applyPageData();
