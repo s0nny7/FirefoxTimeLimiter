@@ -112,8 +112,10 @@ body {
 
 .fake-checkbox {
     position        : relative;
+    min-width       : 1rem;
     width           : 1rem;
     height          : 1rem;
+    min-height      : 1rem;
     border-radius   : 0.5rem;
     background-color: rgba(225, 225, 225, 1);
     display         : flex;
@@ -269,13 +271,29 @@ body {
 
     box-shadow: 0px 0px 10px 0px rgb(73, 73, 73);
 
-    overflow: hidden;
+    overflow: scroll;
 }
 
 #extended-content-internal {
-    width     : 100%;
-    padding   : 0.5rem;
-    box-sizing: border-box;
+    display       : flex;
+    flex-direction: row;
+    flex-wrap     : wrap;
+    width         : 100%;
+    height        : fit-content;
+    padding       : 0.5rem;
+    box-sizing    : border-box;
+    column-gap    : 0.5rem;
+    row-gap       : 0.5rem;
+}
+
+#extended-content-internal>* {
+    flex: 1;
+}
+
+#save-button,
+#reset-page-time,
+#reset-firefox-time {
+    min-width: 50%;
 }
 
 /* #endregion */
