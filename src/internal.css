@@ -64,7 +64,7 @@ body {
 /* #region Button Styling */
 
 #content button {
-    background-color: rgba(225, 225, 225, 1);
+    background-color: hwb(0 88% 12%);
     border          : none;
     border-radius   : 0.5rem;
     padding         : 0.5rem;
@@ -76,11 +76,24 @@ body {
 }
 
 #content button:hover {
-    background-color: rgba(215, 215, 215, 1);
+    background-color: hwb(0 84% 16%);
 }
 
 #content button:active {
-    background-color: rgba(205, 205, 205, 1);
+    background-color: hwb(0 80% 20%);
+}
+
+#content button.save-needed {
+    background-color: hwb(44 0% 12%);
+    box-shadow      : 2px 6px 11px 0px hwb(43 4% 71%);
+}
+
+#content button.save-needed:hover {
+    background-color: hwb(44 0% 16%);
+}
+
+#content button.save-needed:active {
+    background-color: hwb(44 0% 20%);
 }
 
 /* #endregion */
