@@ -32,7 +32,7 @@ class Settings {
 
     debugMode: boolean | null = null;
 
-    generalPageData: Map<string, PageData> | null = null;
+
 
     updateTimerPerMiliseconds: number | null = null;
     animations: boolean | null = null;
@@ -53,7 +53,6 @@ class Settings {
     async default() {
         this.debugMode = this.debugMode ?? await browser.permissions.contains({ permissions: ["browsingData"] });
 
-        this.generalPageData = this.generalPageData ?? new Map();
         this.updateTimerPerMiliseconds = this.updateTimerPerMiliseconds ?? 100;
         this.animations = this.animations ?? true;
         this.darkMode = this.darkMode ?? false;
@@ -83,9 +82,6 @@ class Settings {
             "transparency",
             "backgroundTransparency"]);
 
-        if (saved["generalPageData"] != null) {
-            this.generalPageData = JSON.parse(saved["generalPageData"]);
-        }
         this.updateTimerPerMiliseconds = saved["updateTimerPerMiliseconds"];
         this.animations = saved["animations"];
         this.darkMode = saved["darkMode"];
@@ -95,7 +91,7 @@ class Settings {
         this.firefoxTimeLimit = saved["firefoxTimeLimit"];
         this.firefoxBreakTime = saved["firefoxBreakTime"];
         if (saved["websiteTimeLimit"] != null) {
-            this.websiteTimeLimit = JSON.parse(saved["websiteTimeLimit"]);
+            this.websiteTimeLimit = new Map(Object.entries(JSON.parse(saved["websiteTimeLimit"])));
         }
         this.breakTime = saved["breakTime"];
         this.transparency = saved["transparency"];
@@ -105,10 +101,8 @@ class Settings {
     }
 
     save() {
-        let generalPageData = JSON.stringify(this.generalPageData);
         let websiteTimeLimit = JSON.stringify(this.websiteTimeLimit);
         browser.storage.local.set({
-            "generalPageData": generalPageData,
             "updateTimerPerMiliseconds": this.updateTimerPerMiliseconds,
             "animations": this.animations,
             "darkMode": this.darkMode,

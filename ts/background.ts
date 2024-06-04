@@ -2,6 +2,22 @@ async function background() {
     var settings = new Settings();
     await settings.load();
 
+    var generalPageData: Map<string, PageData> = new Map();
+
+    let saved = await browser.storage.local.get(["generalPageData"]);
+
+    if (saved["generalPageData"] != null) {
+
+        generalPageData = new Map(Object.entries(JSON.parse(saved["generalPageData"])));
+    }
+
+    function savePageData() {
+        let parsed = JSON.stringify(generalPageData);
+        browser.storage.local.set({
+            "generalPageData": parsed,
+        })
+    }
+
     var firefoxActive = true;
 
     /**
@@ -95,6 +111,7 @@ async function background() {
         let message = new MessageFromBackground();
         message.pageTimeUpdate = foundTime;
         message.firefoxTimeUpdate = totalFirefoxUseTime;
+        message.pageData = generalPageData.get(found!) ?? new PageData();
 
         message.settings = settings;
 
@@ -189,6 +206,12 @@ async function background() {
         if (message.debugReload == true) {
             browser.browsingData.removeCache({ since: 0 });
             browser.tabs.reload(currentPage!);
+        }
+
+
+        if (message.pageData != null) {
+            generalPageData.set(new URL(message.pageUrl).hostname, message.pageData);
+            savePageData()
         }
 
     }
