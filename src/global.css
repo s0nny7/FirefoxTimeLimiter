@@ -32,6 +32,6 @@
     border-bottom-right-radius: 0 !important;
 }
 
-#com-limitlost-limiter-panel-container.com-limitlost-limiter-transition {
+#com-limitlost-limiter-panel-container.com-limitlost-limiter-animated.com-limitlost-limiter-transition {
     transition: width 0.2s, height 0.2s !important;
 }

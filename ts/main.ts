@@ -58,6 +58,7 @@ var currentTimeLeftPage: HTMLTableCellElement | null = null;
 var currentTimeLeftPageRow: HTMLTableRowElement | null = null;
 var currentTimeLeftFirefox: HTMLTableCellElement | null = null;
 var currentTimeLeftFirefoxRow: HTMLTableRowElement | null = null;
+var animationsCheckBox: HTMLInputElement | null = null;
 var darkModeCheckBox: HTMLInputElement | null = null;
 var fixTransparencyCheckBox: HTMLInputElement | null = null;
 
@@ -274,17 +275,24 @@ function createContent() {
     // Save Button
     saveButton = <HTMLButtonElement>panelDocument.getElementById("save-button")!;
 
-    //Disable Animations
-    //TODO Setup Action
+    // Animations Checkbox
+    animationsCheckBox = <HTMLInputElement>panelDocument.getElementById("animations-checkbox")!;
+    animationsCheckBox.onchange = () => {
+        saveNeeded();
+        page_settings!.animations = animationsCheckBox?.checked ?? false;
 
-    //Dark Mode
+        panelContainer!.classList.toggle("com-limitlost-limiter-animated", page_settings!.animations!)
+        panelDocument!.body.parentElement!.classList.toggle("no-animations", !page_settings!.animations!);
+    }
+
+    //Dark Mode Checkbox
     darkModeCheckBox = <HTMLInputElement>panelDocument.getElementById("dark-mode-checkbox")!;
     darkModeCheckBox.onchange = () => {
         saveNeeded();
         page_settings!.darkMode = darkModeCheckBox?.checked ?? false;
         panelDocument!.body.parentElement!.classList.toggle("dark-mode", page_settings!.darkMode);
     }
-    //Fix Transparency
+    //Fix Transparency Checkbox
     fixTransparencyCheckBox = <HTMLInputElement>panelDocument.getElementById("fix-transparency-checkbox")!;
     fixTransparencyCheckBox.onchange = () => {
         pageData!.fixTransparency = fixTransparencyCheckBox?.checked ?? false;

@@ -20,6 +20,10 @@ html.dark-mode {
     color           : white;
 }
 
+.no-animations * {
+    transition: none !important;
+}
+
 body {
     display       : flex;
     flex-direction: column;
