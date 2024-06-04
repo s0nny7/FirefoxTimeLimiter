@@ -34,6 +34,18 @@ var minimized = false;
 var oldSizeWidth = "";
 var oldSizeHeight = "";
 
+//Variables and checks needed for iframe transparency
+var colorSchemeMeta: HTMLMetaElement | null = null;
+var darkMode = false;
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+    darkMode = event.matches;
+    if (pageData?.fixTransparency) {
+        darkMode = !darkMode
+    }
+    if (colorSchemeMeta != null) {
+        colorSchemeMeta.content = darkMode ? "dark" : "light";
+    }
+});
 
 
 let panelContainer: HTMLDivElement | null = null;
@@ -46,6 +58,7 @@ var currentTimeLeftPage: HTMLTableCellElement | null = null;
 var currentTimeLeftPageRow: HTMLTableRowElement | null = null;
 var currentTimeLeftFirefox: HTMLTableCellElement | null = null;
 var currentTimeLeftFirefoxRow: HTMLTableRowElement | null = null;
+var fixTransparencyCheckBox: HTMLInputElement | null = null;
 
 var extended = false;
 var beforeExtensionHeight = 0;
@@ -68,6 +81,17 @@ function applyPageData() {
         if (pageData.positionY != null) {
             panel.style.top = pageData.positionY + "%"
         }
+        fixTransparencyCheckBox!.checked = pageData.fixTransparency;
+        if (colorSchemeMeta != null) {
+            darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+            if (pageData?.fixTransparency) {
+                darkMode = !darkMode
+            }
+            colorSchemeMeta.content = darkMode ? "dark" : "light";
+        }
+
+    }
+}
     }
 }
 
@@ -253,7 +277,19 @@ function createContent() {
     //TODO Setup Action
 
     //Dark Mode
-    //TODO Setup Action
+    //Fix Transparency
+    fixTransparencyCheckBox = <HTMLInputElement>panelDocument.getElementById("fix-transparency-checkbox")!;
+    fixTransparencyCheckBox.onchange = () => {
+        pageData!.fixTransparency = fixTransparencyCheckBox?.checked ?? false;
+
+        darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (pageData?.fixTransparency) {
+            darkMode = !darkMode
+        }
+        colorSchemeMeta!.content = darkMode ? "dark" : "light";
+
+        pageDataUpdate();
+    }
 
 
     //Reset Time Count On Page Button
@@ -296,6 +332,14 @@ async function createPanel() {
     panel.onload = () => {
         let innerWindow = panel!.contentWindow!
         let innerDocument = innerWindow.document
+
+        //Dark mode meta update
+        darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (pageData?.fixTransparency) {
+            darkMode = !darkMode
+        }
+        colorSchemeMeta = innerDocument.getElementById("meta-color-scheme") as HTMLMetaElement;
+        colorSchemeMeta.content = darkMode ? "dark" : "light";
 
         style(innerDocument);
 

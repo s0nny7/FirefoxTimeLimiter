@@ -15,6 +15,7 @@ class PageData {
     width: number | null = null;
     heightExtended: number | null = null;
     widthExtended: number | null = null;
+    fixTransparency: boolean = false;
     constructor() {
     }
 }
