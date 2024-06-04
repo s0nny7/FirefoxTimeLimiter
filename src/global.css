@@ -5,9 +5,9 @@
     border   : 0 !important;
 
     overflow                  : hidden !important;
-    min-height                : 2rem !important;
-    min-width                 : 3rem !important;
-    border-radius             : 0.5rem !important;
+    min-height                : calc(2 * var(--com-limitlost-limiter-font-size)) !important;
+    min-width                 : calc(3 * var(--com-limitlost-limiter-font-size)) !important;
+    border-radius             : calc(0.5 * var(--com-limitlost-limiter-font-size)) !important;
     border-bottom-right-radius: 0 !important;
 }
 
@@ -25,10 +25,10 @@
     resize  : horizontal !important;
     overflow: hidden !important;
 
-    min-height: 2rem !important;
-    min-width : 3rem !important;
+    min-height: calc(2 * var(--com-limitlost-limiter-font-size)) !important;
+    min-width : calc(3 * var(--com-limitlost-limiter-font-size)) !important;
 
-    border-radius             : 0.5rem !important;
+    border-radius             : calc(0.5 * var(--com-limitlost-limiter-font-size)) !important;
     border-bottom-right-radius: 0 !important;
 }
 

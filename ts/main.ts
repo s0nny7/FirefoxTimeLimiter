@@ -391,6 +391,9 @@ async function createPanel() {
         let innerWindow = panel!.contentWindow!
         let innerDocument = innerWindow.document
 
+        let iframe_font_size = innerWindow.getComputedStyle(innerDocument.body).getPropertyValue('font-size').match(/\d+/)![0];
+        panelContainer?.style.setProperty("--com-limitlost-limiter-font-size", iframe_font_size + "px");
+
         //Dark mode meta update
         metaDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
         if (pageData?.fixTransparency) {
