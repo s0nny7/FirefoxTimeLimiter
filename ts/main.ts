@@ -36,14 +36,14 @@ var oldSizeHeight = "";
 
 //Variables and checks needed for iframe transparency
 var colorSchemeMeta: HTMLMetaElement | null = null;
-var darkMode = false;
+var metaDarkMode = false;
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-    darkMode = event.matches;
+    metaDarkMode = event.matches;
     if (pageData?.fixTransparency) {
-        darkMode = !darkMode
+        metaDarkMode = !metaDarkMode
     }
     if (colorSchemeMeta != null) {
-        colorSchemeMeta.content = darkMode ? "dark" : "light";
+        colorSchemeMeta.content = metaDarkMode ? "dark" : "light";
     }
 });
 
@@ -58,6 +58,7 @@ var currentTimeLeftPage: HTMLTableCellElement | null = null;
 var currentTimeLeftPageRow: HTMLTableRowElement | null = null;
 var currentTimeLeftFirefox: HTMLTableCellElement | null = null;
 var currentTimeLeftFirefoxRow: HTMLTableRowElement | null = null;
+var darkModeCheckBox: HTMLInputElement | null = null;
 var fixTransparencyCheckBox: HTMLInputElement | null = null;
 
 var extended = false;
@@ -83,11 +84,11 @@ function applyPageData() {
         }
         fixTransparencyCheckBox!.checked = pageData.fixTransparency;
         if (colorSchemeMeta != null) {
-            darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+            metaDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
             if (pageData?.fixTransparency) {
-                darkMode = !darkMode
+                metaDarkMode = !metaDarkMode
             }
-            colorSchemeMeta.content = darkMode ? "dark" : "light";
+            colorSchemeMeta.content = metaDarkMode ? "dark" : "light";
         }
 
     }
@@ -277,16 +278,22 @@ function createContent() {
     //TODO Setup Action
 
     //Dark Mode
+    darkModeCheckBox = <HTMLInputElement>panelDocument.getElementById("dark-mode-checkbox")!;
+    darkModeCheckBox.onchange = () => {
+        saveNeeded();
+        page_settings!.darkMode = darkModeCheckBox?.checked ?? false;
+        panelDocument!.body.parentElement!.classList.toggle("dark-mode", page_settings!.darkMode);
+    }
     //Fix Transparency
     fixTransparencyCheckBox = <HTMLInputElement>panelDocument.getElementById("fix-transparency-checkbox")!;
     fixTransparencyCheckBox.onchange = () => {
         pageData!.fixTransparency = fixTransparencyCheckBox?.checked ?? false;
 
-        darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+        metaDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
         if (pageData?.fixTransparency) {
-            darkMode = !darkMode
+            metaDarkMode = !metaDarkMode
         }
-        colorSchemeMeta!.content = darkMode ? "dark" : "light";
+        colorSchemeMeta!.content = metaDarkMode ? "dark" : "light";
 
         pageDataUpdate();
     }
@@ -334,12 +341,12 @@ async function createPanel() {
         let innerDocument = innerWindow.document
 
         //Dark mode meta update
-        darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+        metaDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
         if (pageData?.fixTransparency) {
-            darkMode = !darkMode
+            metaDarkMode = !metaDarkMode
         }
         colorSchemeMeta = innerDocument.getElementById("meta-color-scheme") as HTMLMetaElement;
-        colorSchemeMeta.content = darkMode ? "dark" : "light";
+        colorSchemeMeta.content = metaDarkMode ? "dark" : "light";
 
         style(innerDocument);
 

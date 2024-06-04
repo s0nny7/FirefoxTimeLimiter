@@ -10,9 +10,14 @@ body {
 }
 
 html {
-    background-color: rgba(230, 230, 230, 0.8) !important;
+    background-color: hwb(0 90% 10% / 0.8);
     color           : black;
     overflow        : hidden;
+}
+
+html.dark-mode {
+    background-color: hwb(0 10% 90% / 0.8);
+    color           : white;
 }
 
 body {
@@ -73,20 +78,39 @@ body {
     color           : black;
     box-shadow      : 2px 6px 11px 0px rgb(73, 73, 73);
     font-size       : 0.9rem;
-    transition      : background-color 0.2s, box-shadow 0.2s;
+    transition      : background-color 0.2s, box-shadow 0.2s, color 0.2s;
+}
+
+.dark-mode #content button {
+    background-color: hwb(0 12% 88%);
+    color           : white;
+    box-shadow      : 2px 6px 11px 0px hwb(0 31.8% 68.2%);
 }
 
 #content button:hover {
     background-color: hwb(0 84% 16%);
 }
 
+.dark-mode #content button:hover {
+    background-color: hwb(0 16% 84%);
+}
+
 #content button:active {
     background-color: hwb(0 80% 20%);
 }
 
+.dark-mode #content button:active {
+    background-color: hwb(0 20% 80%);
+}
+
 #content button.save-needed {
     background-color: hwb(44 0% 12%);
+    color           : black;
     box-shadow      : 2px 6px 11px 0px hwb(43 4% 71%);
+}
+
+.dark-mode #content button.save-needed {
+    box-shadow: 2px 6px 11px 0px hwb(41.2 0% 41.2%);
 }
 
 #content button.save-needed:hover {
@@ -118,7 +142,7 @@ body {
     height          : 1rem;
     min-height      : 1rem;
     border-radius   : 0.5rem;
-    background-color: rgba(225, 225, 225, 1);
+    background-color: hwb(0 88% 12%);
     display         : flex;
     align-content   : center;
     justify-content : center;
@@ -127,12 +151,25 @@ body {
     overflow        : hidden;
 }
 
+.dark-mode .fake-checkbox {
+    background-color: hwb(0 12% 88%);
+    box-shadow      : 2px 2px 10px 0px hwb(0 31.8% 68.2%);
+}
+
 .checkbox-row input:hover~.fake-checkbox {
     background-color: rgb(215, 215, 215);
 }
 
+.dark-mode .checkbox-row input:hover~.fake-checkbox {
+    background-color: hwb(0 16% 84%);
+}
+
 .checkbox-row input:active~.fake-checkbox {
     background-color: rgb(205, 205, 205);
+}
+
+.dark-mode .checkbox-row input:active~.fake-checkbox {
+    background-color: hwb(0 20% 80%);
 }
 
 
@@ -147,8 +184,12 @@ body {
     font-size  : 1.5rem;
     text-align : center;
     line-height: calc(100% - 0.7rem);
-    color      : #aeaeae70;
+    color      : rgba(174, 174, 174, 0.439);
     font-weight: bold;
+}
+
+.dark-mode .fake-checkbox:before {
+    color: hwb(0 32% 68% / 0.439);
 }
 
 .fake-checkbox .internal {
@@ -170,6 +211,10 @@ body {
     transition: opacity 0.2s;
 }
 
+.dark-mode .fake-checkbox .internal {
+    background-color: hwb(0 87% 13%);
+}
+
 .fake-checkbox .internal:after {
 
     content          : "";
@@ -184,6 +229,11 @@ body {
     box-sizing       : border-box;
 }
 
+.dark-mode .fake-checkbox .internal:after {
+    border      : solid black;
+    border-width: 0 3px 3px 0;
+}
+
 .checkbox-row input:checked~.fake-checkbox .internal {
     opacity: 1;
 }
@@ -192,8 +242,16 @@ body {
     background-color: rgb(59, 59, 59);
 }
 
+.dark-mode .checkbox-row input:checked:hover~.fake-checkbox .internal {
+    background-color: hwb(0 77% 23%);
+}
+
 .checkbox-row input:checked:active~.fake-checkbox .internal {
     background-color: rgb(73, 73, 73);
+}
+
+.dark-mode .checkbox-row input:checked:active~.fake-checkbox .internal {
+    background-color: hwb(0 71% 29%);
 }
 
 /* #endregion */
@@ -207,6 +265,10 @@ body {
     justify-content : center;
     flex-direction  : row;
     box-sizing      : border-box;
+}
+
+.dark-mode #top-bar {
+    background-color: rgba(0, 0, 0, 0.8);
 }
 
 #top-bar-button {
@@ -234,9 +296,15 @@ body {
 #top-bar-button svg path {
     height      : 100%;
     aspect-ratio: 1/1;
-    color       : #000000 !important;
-    fill        : #000000 !important;
-    stroke      : #000000 !important;
+    color       : black;
+    fill        : black;
+    stroke      : black;
+}
+
+.dark-mode #top-bar-button svg path {
+    color : white;
+    fill  : white;
+    stroke: white;
 }
 
 /* #endregion */
@@ -273,6 +341,10 @@ body {
     box-shadow: 0px 0px 10px 0px rgb(73, 73, 73);
 
     overflow: scroll;
+}
+
+.dark-mode #extended-content {
+    box-shadow: 0px 0px 10px 0px hwb(0 31.8% 68.2%);
 }
 
 #extended-content-internal {
