@@ -47,6 +47,7 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', eve
     }
 });
 
+var panelDocument: Document | null = null;
 
 let panelContainer: HTMLDivElement | null = null;
 var panel: HTMLIFrameElement | null = null;
@@ -67,6 +68,28 @@ var beforeExtensionHeight = 0;
 
 //Extended Content Variables
 var saveButton: HTMLButtonElement | null = null;
+function saveNeeded() {
+    if (saveButton != null) {
+        saveButton.classList.add("save-needed");
+    }
+}
+
+function saveNotNeeded() {
+    if (saveButton != null) {
+        saveButton.classList.remove("save-needed");
+    }
+}
+
+var pageDataTimeout: number | null = null;
+function pageDataUpdate() {
+    if (pageDataTimeout == null) {
+        pageDataTimeout = setTimeout(() => {
+            let message = new MessageForBackground();
+            message.pageData = pageData;
+            browser.runtime.sendMessage(message);
+        }, 1000);
+    }
+}
 
 function applyPageData() {
     if (panel != null && pageData != null) {
@@ -94,6 +117,16 @@ function applyPageData() {
 
     }
 }
+
+function applySettings() {
+    if (panel != null && page_settings != null) {
+        animationsCheckBox!.checked = page_settings.animations!;
+        panelContainer!.classList.toggle("com-limitlost-limiter-animated", page_settings.animations!)
+        panelDocument!.body.parentElement!.classList.toggle("no-animations", !page_settings.animations!);
+
+        darkModeCheckBox!.checked = page_settings.darkMode!;
+        panelDocument!.body.parentElement!.classList.toggle("dark-mode", page_settings!.darkMode!);
+        saveNotNeeded();
     }
 }
 
@@ -187,7 +220,7 @@ function formatDuration(millis: number) {
 }
 
 function createContent() {
-    let panelDocument = panel!.contentWindow!.document;
+    panelDocument = panel!.contentWindow!.document;
 
     // Current Time On Page
     currentTimeOnPage = <HTMLTableCellElement>panelDocument.getElementById("current-time-on-page")!;
@@ -274,6 +307,13 @@ function createContent() {
 
     // Save Button
     saveButton = <HTMLButtonElement>panelDocument.getElementById("save-button")!;
+    saveButton.onclick = () => {
+        saveNotNeeded();
+
+        let message = new MessageForBackground();
+        message.settings = page_settings;
+        browser.runtime.sendMessage(message);
+    }
 
     // Animations Checkbox
     animationsCheckBox = <HTMLInputElement>panelDocument.getElementById("animations-checkbox")!;
@@ -325,6 +365,9 @@ function createContent() {
 
         browser.runtime.sendMessage(message);
     }
+
+    applySettings();
+    applyPageData();
 
     extendedDivParent.style.height = extendedDiv.offsetHeight + "px";
 }
@@ -472,6 +515,7 @@ function messageListener(m: any, sender: browser.runtime.MessageSender, sendResp
     let message = <MessageFromBackground>m;
     if (message.settings != null) {
         page_settings = message.settings;
+        applySettings();
     }
     if (message.pageData != null) {
         pageData = message.pageData
