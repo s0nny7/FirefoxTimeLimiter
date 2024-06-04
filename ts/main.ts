@@ -62,6 +62,8 @@ var currentTimeLeftFirefoxRow: HTMLTableRowElement | null = null;
 var animationsCheckBox: HTMLInputElement | null = null;
 var darkModeCheckBox: HTMLInputElement | null = null;
 var fixTransparencyCheckBox: HTMLInputElement | null = null;
+var showFirefoxTimeCheckBox: HTMLInputElement | null = null;
+var showPageTimeCheckBox: HTMLInputElement | null = null;
 var transparencySlider: HTMLInputElement | null = null;
 var backgroundTransparencySlider: HTMLInputElement | null = null;
 
@@ -134,6 +136,20 @@ function applySettings() {
 
         backgroundTransparencySlider!.value = (page_settings.backgroundTransparency! * 100).toString();
         panelDocument!.body.parentElement!.style.setProperty("--background-opacity", page_settings.backgroundTransparency!.toString());
+
+        showFirefoxTimeCheckBox!.checked = page_settings.showCurrentTimeFirefox!;
+        if (page_settings.showCurrentTimeFirefox!) {
+            currentTimeFirefoxRow!.style.display = "";
+        } else {
+            currentTimeFirefoxRow!.style.display = "none";
+        }
+
+        showPageTimeCheckBox!.checked = page_settings.showCurrentTimeWebsite!;
+        if (page_settings.showCurrentTimeWebsite!) {
+            currentTimeOnPageRow!.style.display = "";
+        } else {
+            currentTimeOnPageRow!.style.display = "none";
+        }
 
         saveNotNeeded();
     }
@@ -353,6 +369,28 @@ function createContent() {
         colorSchemeMeta!.content = metaDarkMode ? "dark" : "light";
 
         pageDataUpdate();
+    }
+    // Show Firefox Time Checkbox
+    showFirefoxTimeCheckBox = <HTMLInputElement>panelDocument.getElementById("show-firefox-time-checkbox")!;
+    showFirefoxTimeCheckBox.onchange = () => {
+        saveNeeded();
+        page_settings!.showCurrentTimeFirefox = showFirefoxTimeCheckBox?.checked ?? false;
+        if (page_settings!.showCurrentTimeFirefox) {
+            currentTimeFirefoxRow!.style.display = "";
+        } else {
+            currentTimeFirefoxRow!.style.display = "none";
+        }
+    }
+    //Show Page Time Checkbox
+    showPageTimeCheckBox = <HTMLInputElement>panelDocument.getElementById("show-page-time-checkbox")!;
+    showPageTimeCheckBox.onchange = () => {
+        saveNeeded();
+        page_settings!.showCurrentTimeWebsite = showPageTimeCheckBox?.checked ?? false;
+        if (page_settings!.showCurrentTimeWebsite) {
+            currentTimeOnPageRow!.style.display = "";
+        } else {
+            currentTimeOnPageRow!.style.display = "none";
+        }
     }
 
 
