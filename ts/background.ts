@@ -281,6 +281,16 @@ async function background() {
         if (message.initializationRequest == true && currentPage != null) {
             initializePage(currentPage, new URL(message.pageUrl).hostname, message.pageUrl)
         }
+
+        if (message.resetTimeCountFirefox == true) {
+            totalFirefoxUseTime = 0;
+            saveTimeData();
+        }
+
+        if (message.resetTimeCountPage == true) {
+            totalWebsiteUseTime.get(currentUsed!)!.timeCounted = 0;
+            saveTimeData();
+        }
     }
     browser.runtime.onMessage.addListener(handleContentMessage);
 
