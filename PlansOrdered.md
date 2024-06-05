@@ -1,3 +1,0 @@
-- [ ] Handle Frontend
-- [ ] Handle Background
-  - [ ] Load Or Create Use Time

@@ -38,8 +38,8 @@ Add `"browsingData"` permission to the list in [manifest.json](/src/manifest.jso
   - After Extending:
     - [x] Disable Animations
     - [x] Dark Mode
-    - [ ] Show Current Time While Using Firefox
-    - [ ] Show Current Time While Using Current Website
+    - [x] Show Current Time While Using Firefox
+    - [x] Show Current Time While Using Current Website
     - [x] Reset Break Time On This Page Button
     - [ ] Set Time Limit In Firefox
     - [ ] Set Time Limit On Pages List
