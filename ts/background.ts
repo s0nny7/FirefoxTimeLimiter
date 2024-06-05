@@ -223,7 +223,12 @@ async function background() {
 
         }
     }
-    var timeUpdateInterval = setInterval(timeUpdate, 100)
+
+    function autoSave() {
+        saveTimeData();
+    }
+    setInterval(autoSave, 1000)
+
     browser.windows.onFocusChanged.addListener((windowId) => {
         if (windowId == browser.windows.WINDOW_ID_NONE) {
             firefoxActive = false;
