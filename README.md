@@ -41,12 +41,11 @@ Add `"browsingData"` permission to the list in [manifest.json](/src/manifest.jso
     - [x] Show Current Time While Using Firefox
     - [x] Show Current Time While Using Current Website
     - [x] Reset Break Time On This Page Button
-    - [ ] Set Time Limit In Firefox
+    - [x] Set Time Limit In Firefox
     - [ ] Set Time Limit On Pages List
-    - [ ] Enable Break Time
-    - [ ] Set Break Time for Firefox
+    - [x] Set Break Time for Firefox
     - [ ] Set Break Time List
-    - [ ] Reset Limit Counting after X Hours of Inactivity
+    - [x] Reset Limit Counting after X Hours of Inactivity
     - [x] Edit Transparency
     - [x] Edit Background Transparency
 
