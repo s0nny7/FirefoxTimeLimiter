@@ -208,6 +208,14 @@ async function background() {
             browser.tabs.reload(currentPage!);
         }
 
+        if (message.settings != null) {
+            if (message.settings.updateTimerPerMiliseconds != settings.updateTimerPerMiliseconds) {
+                clearInterval(timeUpdateInterval)
+                timeUpdateInterval = setInterval(timeUpdate, message.settings.updateTimerPerMiliseconds!)
+            }
+            settings = Object.assign(new Settings(), message.settings);
+            settings.save();
+        }
 
         if (message.pageData != null) {
             generalPageData.set(new URL(message.pageUrl).hostname, message.pageData);

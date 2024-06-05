@@ -66,6 +66,7 @@ var showFirefoxTimeCheckBox: HTMLInputElement | null = null;
 var showPageTimeCheckBox: HTMLInputElement | null = null;
 var transparencySlider: HTMLInputElement | null = null;
 var backgroundTransparencySlider: HTMLInputElement | null = null;
+var timeUpdateIntervalInput: HTMLInputElement | null = null;
 
 var extended = false;
 var beforeExtensionHeight = 0;
@@ -150,6 +151,8 @@ function applySettings() {
         } else {
             currentTimeOnPageRow!.style.display = "none";
         }
+        //Time Update Interval
+        timeUpdateIntervalInput!.value = page_settings.updateTimerPerMiliseconds!.toString();
 
         saveNotNeeded();
     }
@@ -426,6 +429,26 @@ function createContent() {
         saveNeeded();
         page_settings!.backgroundTransparency = parseFloat(backgroundTransparencySlider!.value) / 100;
         panelDocument!.body.parentElement!.style.setProperty("--background-opacity", page_settings!.backgroundTransparency.toString());
+    }
+
+    //Time Update Interval
+    timeUpdateIntervalInput = <HTMLInputElement>panelDocument.getElementById("time-update-interval")!;
+    timeUpdateIntervalInput.onblur = () => {
+        saveNeeded();
+        //Removing non numeric characters with regex clears entire string for some reason
+
+        let parsed = parseInt(timeUpdateIntervalInput!.value);
+
+        if (isNaN(parsed) || !isFinite(parsed) || parsed < 100) {
+            timeUpdateIntervalInput!.value = "100";
+            parsed = 100;
+        }
+        //Max Check
+        if (parsed > 60_000) {
+            timeUpdateIntervalInput!.value = "60000";
+            parsed = 60_000;
+        }
+        page_settings!.updateTimerPerMiliseconds = parsed;
     }
 
 
