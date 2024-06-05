@@ -309,6 +309,12 @@ input[type="number"] {
     box-shadow      : 2px 6px 11px 0px rgb(73, 73, 73);
 }
 
+.dark-mode input[type="number"] {
+    background-color: hwb(0 12% 88%);
+    color           : white;
+    box-shadow      : 2px 6px 11px 0px hwb(0 31.8% 68.2%);
+}
+
 /* #endregion */
 
 /* #region Top Bar Styling */
