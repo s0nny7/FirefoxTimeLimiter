@@ -91,7 +91,7 @@ class Settings {
         this.firefoxTimeLimit = saved["firefoxTimeLimit"];
         this.firefoxBreakTime = saved["firefoxBreakTime"];
         if (saved["websiteTimeLimit"] != null) {
-            this.websiteTimeLimit = new Map(Object.entries(JSON.parse(saved["websiteTimeLimit"])));
+            this.websiteTimeLimit = new Map(JSON.parse(saved["websiteTimeLimit"]));
         }
         this.breakTime = saved["breakTime"];
         this.transparency = saved["transparency"];
@@ -101,7 +101,7 @@ class Settings {
     }
 
     save() {
-        let websiteTimeLimit = JSON.stringify(this.websiteTimeLimit);
+        let websiteTimeLimit = JSON.stringify(Array.from(this.websiteTimeLimit!.entries()));
         browser.storage.local.set({
             "updateTimerPerMiliseconds": this.updateTimerPerMiliseconds,
             "animations": this.animations,

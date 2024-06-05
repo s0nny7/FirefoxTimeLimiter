@@ -8,11 +8,11 @@ async function background() {
 
     if (saved["generalPageData"] != null) {
 
-        generalPageData = new Map(Object.entries(JSON.parse(saved["generalPageData"])));
+        generalPageData = new Map(JSON.parse(saved["generalPageData"]));
     }
 
     function savePageData() {
-        let parsed = JSON.stringify(generalPageData);
+        let parsed = JSON.stringify(Array.from(generalPageData.entries()));
         browser.storage.local.set({
             "generalPageData": parsed,
         })
