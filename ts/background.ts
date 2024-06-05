@@ -223,6 +223,7 @@ async function background() {
 
         }
     }
+    var timeUpdateInterval = setInterval(timeUpdate, settings.updateTimerPerMiliseconds!)
 
     function autoSave() {
         saveTimeData();
