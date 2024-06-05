@@ -276,13 +276,14 @@ function createContent() {
 
     //Extended Content Variables
     let extendedDivParent = panelDocument.createElement("extended-content");
-    let extendedDiv = panelDocument.getElementById("extended-content-internal")!;
+    let advancedOptionsLabel = panelDocument.getElementById("extended-advanced");
     // Extend Button
 
     let extendButton = panelDocument.getElementById("extend-button")!;
 
     extendButton.onclick = () => {
         let rect = panelContainer!.getBoundingClientRect()
+        let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
         if (extended) {
             extendButton.innerText = "Extend";
             panelContainer!.classList.add("com-limitlost-limiter-transition");
@@ -293,8 +294,8 @@ function createContent() {
             panelContainer!.style.height = rect.height + "px";
             extendButton.innerText = "Hide";
             panelContainer!.classList.add("com-limitlost-limiter-transition");
-            extendedDivParent.style.setProperty("height", extendedDiv.offsetHeight + "px", "important");
-            panelContainer!.style.setProperty("height", beforeExtensionHeight + extendedDiv.offsetHeight + "px", "important");
+            extendedDivParent.style.setProperty("height", (advancedRect.top - beforeExtensionHeight + advancedRect.height) + "px", "important");
+            panelContainer!.style.setProperty("height", (advancedRect.top + advancedRect.height) + "px", "important");
         }
         extended = !extended;
     }
@@ -434,7 +435,9 @@ function createContent() {
     applySettings();
     applyPageData();
 
-    extendedDivParent.style.height = extendedDiv.offsetHeight + "px";
+    let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
+
+    extendedDivParent.style.height = (advancedRect.top + advancedRect.height) + "px";
 }
 
 

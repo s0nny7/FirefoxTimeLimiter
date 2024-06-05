@@ -391,37 +391,13 @@ input[type="number"] {
     gap           : 0.25rem;
 }
 
-input[type="range"] {
-    border-radius   : 1rem;
-    height          : 0.9rem;
-    background-color: hwb(0 67.8% 32.2%);
+#extended-advanced {
+    min-width: 100%;
 }
 
-.dark-mode input[type="range"] {
-    background-color: hwb(0 32.2% 67.8%);
-
-}
-
-input[type="range"]::-moz-range-thumb {
-    background-color: #e4e4e4;
-    border-radius   : 2rem;
-    height          : 1.5rem;
-    width           : 1.5rem;
-    outline         : 1px solid #bababa;
-    border          : none;
-}
-
-.dark-mode input[type="range"]::-moz-range-thumb {
-    background-color: hwb(0 27.8% 72.2%);
-    outline         : 1px solid hwb(0 42% 58%);
-}
-
-input[type="range"]::-moz-range-thumb:hover {
-    opacity: 0.75;
-}
-
-input[type="range"]::-moz-range-thumb:active {
-    opacity: 0.5;
+#extended-advanced-info {
+    opacity     : 0.5;
+    padding-left: 0.5rem;
 }
 
 /* #endregion */
