@@ -62,6 +62,10 @@ body {
     flex-direction: row;
 }
 
+.half-transparent {
+    opacity: 0.5;
+}
+
 /* #endregion */
 
 /* #region Table Styling */
