@@ -49,28 +49,7 @@ async function background() {
         return true;
     }
 
-    async function pageHandle(tabId: number) {
-        let pageData = await browser.tabs.get(tabId);
-        let url = pageData.url!
-        let hostname = new URL(url).hostname;
-        if (hostname == "") {
-            currentUsed = null;
-            currentPage = null;
-            return;
-        }
-        currentPage = tabId;
-
-
-        if (pageData.status != "complete") {
-            pageLoading = true;
-            //Page handling will be done after status update
-            return;
-        } else {
-            pageLoading = false;
-        }
-
-
-
+    async function initializePage(tabId: number, hostname: string, url: string) {
         let found = null
 
         let matchedUrl = false;
@@ -105,9 +84,6 @@ async function background() {
 
         currentUsed = found
 
-
-
-
         let message = new MessageFromBackground();
         message.pageTimeUpdate = foundTime;
         message.firefoxTimeUpdate = totalFirefoxUseTime;
@@ -115,9 +91,32 @@ async function background() {
 
         message.settings = settings;
 
-
-
         browser.tabs.sendMessage(tabId, message);
+    }
+
+    async function pageHandle(tabId: number) {
+        let pageData = await browser.tabs.get(tabId);
+        let url = pageData.url!
+        let hostname = new URL(url).hostname;
+        if (hostname == "") {
+            currentUsed = null;
+            currentPage = null;
+            return;
+        }
+        currentPage = tabId;
+
+
+        if (pageData.status != "complete") {
+            pageLoading = true;
+            //Page handling will be done after status update
+            return;
+        } else {
+            pageLoading = false;
+        }
+
+
+
+        initializePage(tabId, hostname, url)
     }
     /**
      * Tab ID
@@ -222,6 +221,9 @@ async function background() {
             savePageData()
         }
 
+        if (message.initializationRequest == true && currentPage != null) {
+            initializePage(currentPage, new URL(message.pageUrl).hostname, message.pageUrl)
+        }
     }
     browser.runtime.onMessage.addListener(handleContentMessage);
 

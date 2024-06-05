@@ -637,6 +637,11 @@ function messageListener(m: any, sender: browser.runtime.MessageSender, sendResp
     if (first && page_settings != null) {
         createPanel();
         first = false;
+    } else if (first) {
+        //Panel wasn't initialized yet but the messages are received
+        let message = new MessageForBackground();
+        message.initializationRequest = true;
+        browser.runtime.sendMessage(message);
     }
 
 }
