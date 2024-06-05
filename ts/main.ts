@@ -125,26 +125,27 @@ function applyPageData() {
 
 function applySettings() {
     if (panel != null && page_settings != null) {
+        //Animations
         animationsCheckBox!.checked = page_settings.animations!;
         panelContainer!.classList.toggle("com-limitlost-limiter-animated", page_settings.animations!)
         panelDocument!.body.parentElement!.classList.toggle("no-animations", !page_settings.animations!);
-
+        //Dark Mode
         darkModeCheckBox!.checked = page_settings.darkMode!;
         panelDocument!.body.parentElement!.classList.toggle("dark-mode", page_settings!.darkMode!);
-
+        //Transparency
         transparencySlider!.value = (page_settings.transparency! * 100).toString();
         panelContainer!.style.setProperty("opacity", page_settings.transparency!.toString(), "important");
-
+        //Background Transparency
         backgroundTransparencySlider!.value = (page_settings.backgroundTransparency! * 100).toString();
         panelDocument!.body.parentElement!.style.setProperty("--background-opacity", page_settings.backgroundTransparency!.toString());
-
+        //Show Firefox Time 
         showFirefoxTimeCheckBox!.checked = page_settings.showCurrentTimeFirefox!;
         if (page_settings.showCurrentTimeFirefox!) {
             currentTimeFirefoxRow!.style.display = "";
         } else {
             currentTimeFirefoxRow!.style.display = "none";
         }
-
+        //Show Page Time
         showPageTimeCheckBox!.checked = page_settings.showCurrentTimeWebsite!;
         if (page_settings.showCurrentTimeWebsite!) {
             currentTimeOnPageRow!.style.display = "";
