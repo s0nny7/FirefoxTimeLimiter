@@ -30,6 +30,47 @@ async function background() {
      * In Milliseconds
      */
     var lastTimeUpdate = nowUtcMillis();
+    /**
+     * In Milliseconds, The Moment when extension was activated
+     */
+    var startTime = nowUtcMillis();
+
+    function loadTimeData() {
+        browser.storage.local.get(["totalWebsiteUseTime",
+            "totalFirefoxUseTime", "lastTimeUpdate"]).then((result) => {
+                totalWebsiteUseTime = new Map(JSON.parse(result["totalWebsiteUseTime"]))
+                totalFirefoxUseTime = result["totalFirefoxUseTime"] ?? 0;
+                lastTimeUpdate = result["lastTimeUpdate"] ?? nowUtcMillis();
+            });
+    }
+    await loadTimeData();
+
+    function saveTimeData() {
+        browser.storage.local.set({
+            "totalWebsiteUseTime": JSON.stringify(Array.from(totalWebsiteUseTime.entries())),
+            "totalFirefoxUseTime": totalFirefoxUseTime,
+            "lastTimeUpdate": lastTimeUpdate
+        });
+    }
+    //Check for reset
+    function resetTimeData() {
+        totalFirefoxUseTime = 0;
+        totalWebsiteUseTime = new Map();
+        saveTimeData();
+    }
+    function resetTimeDataCheck(currentTimeMillis: number) {
+        if (lastTimeUpdate < currentTimeMillis && settings.resetTimeCountAfter! > 0) {
+            let diff = currentTimeMillis - lastTimeUpdate
+            //Reset Check
+            if (diff > settings.resetTimeCountAfter! * 3600 * 1000) {
+                lastTimeUpdate = currentTimeMillis
+                resetTimeData();
+            }
+        }
+    }
+    resetTimeDataCheck(startTime)
+
+
 
     async function pageCanBeLimited(tabId: number) {
         try {
@@ -143,11 +184,20 @@ async function background() {
     function timeUpdate() {
         let now = nowUtcMillis();
         let diff = now - lastTimeUpdate;
-        lastTimeUpdate = now;
 
         if (!settings.countTimeOnLostFocus && !firefoxActive) {
             return;
         }
+
+        if (diff > 3 * 60_000) {
+            //Skip potential computer sleep time
+            resetTimeDataCheck(now);
+            lastTimeUpdate = now;
+            return;
+        }
+
+        lastTimeUpdate = now;
+
         if (firefoxActive || settings.countTimeOnLostFocus) {
             totalFirefoxUseTime += diff;
 
@@ -178,6 +228,7 @@ async function background() {
         if (windowId == browser.windows.WINDOW_ID_NONE) {
             firefoxActive = false;
         } else {
+            resetTimeDataCheck(nowUtcMillis());
             firefoxActive = true;
         }
     })

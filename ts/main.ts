@@ -67,6 +67,7 @@ var showPageTimeCheckBox: HTMLInputElement | null = null;
 var transparencySlider: HTMLInputElement | null = null;
 var backgroundTransparencySlider: HTMLInputElement | null = null;
 var timeUpdateIntervalInput: HTMLInputElement | null = null;
+var resetTimeCountAfterInput: HTMLInputElement | null = null;
 
 var extended = false;
 var beforeExtensionHeight = 0;
@@ -154,6 +155,8 @@ function applySettings() {
         }
         //Time Update Interval
         timeUpdateIntervalInput!.value = page_settings.updateTimerPerMiliseconds!.toString();
+        //Reset Time Count After
+        resetTimeCountAfterInput!.value = page_settings.resetTimeCountAfter!.toString();
 
         saveNotNeeded();
     }
@@ -377,6 +380,19 @@ function createContent() {
         }
     }
 
+    //Reset Time Count After Input
+    resetTimeCountAfterInput = <HTMLInputElement>panelDocument.getElementById("reset-time-count-after")!;
+    resetTimeCountAfterInput.onblur = () => {
+        saveNeeded();
+        //Removing non numeric characters with regex clears entire string for some reason
+        let parsed = parseFloat(resetTimeCountAfterInput!.value);
+
+        if (isNaN(parsed) || !isFinite(parsed)) {
+            parsed = 6;
+            resetTimeCountAfterInput!.value = "6";
+        }
+        page_settings!.resetTimeCountAfter = parsed;
+    }
 
     //Reset Time Count On Page Button
     let resetTimeCountOnPageButton = panelDocument.getElementById("reset-page-time")!;

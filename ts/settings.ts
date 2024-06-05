@@ -46,6 +46,10 @@ class Settings {
     breakTime: boolean | null = null;
     transparency: number | null = null;
     backgroundTransparency: number | null = null;
+    /**
+     * In Hours
+     */
+    resetTimeCountAfter: number | null = null;
 
     constructor() {
     }
@@ -65,6 +69,7 @@ class Settings {
         this.breakTime = this.breakTime ?? false;
         this.transparency = this.transparency ?? 1;
         this.backgroundTransparency = this.backgroundTransparency ?? 0.8;
+        this.resetTimeCountAfter = this.resetTimeCountAfter ?? 6;
     }
 
     async load() {
@@ -97,6 +102,8 @@ class Settings {
         this.transparency = saved["transparency"];
         this.backgroundTransparency = saved["backgroundTransparency"];
 
+        this.resetTimeCountAfter = saved["resetTimeCountAfter"];
+
         await this.default()
     }
 
@@ -114,7 +121,8 @@ class Settings {
             "websiteTimeLimit": websiteTimeLimit,
             "breakTime": this.breakTime,
             "transparency": this.transparency,
-            "backgroundTransparency": this.backgroundTransparency
+            "backgroundTransparency": this.backgroundTransparency,
+            "resetTimeCountAfter": this.resetTimeCountAfter
         });
 
     }
