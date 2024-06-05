@@ -68,6 +68,8 @@ var transparencySlider: HTMLInputElement | null = null;
 var backgroundTransparencySlider: HTMLInputElement | null = null;
 var timeUpdateIntervalInput: HTMLInputElement | null = null;
 var resetTimeCountAfterInput: HTMLInputElement | null = null;
+var timeLimitFirefoxInput: HTMLInputElement | null = null;
+var breakTimeFirefoxInput: HTMLInputElement | null = null;
 
 var extended = false;
 var beforeExtensionHeight = 0;
@@ -157,6 +159,10 @@ function applySettings() {
         timeUpdateIntervalInput!.value = page_settings.updateTimerPerMiliseconds!.toString();
         //Reset Time Count After
         resetTimeCountAfterInput!.value = page_settings.resetTimeCountAfter!.toString();
+        //Firefox Time Limit
+        timeLimitFirefoxInput!.value = page_settings.firefoxTimeLimit!.toString();
+        //Break Time Firefox
+        breakTimeFirefoxInput!.value = page_settings.firefoxBreakTime!.toString();
 
         saveNotNeeded();
     }
@@ -392,6 +398,34 @@ function createContent() {
             resetTimeCountAfterInput!.value = "6";
         }
         page_settings!.resetTimeCountAfter = parsed;
+    }
+
+    //Time Limit Firefox Input
+    timeLimitFirefoxInput = <HTMLInputElement>panelDocument.getElementById("time-limit-firefox")!;
+    timeLimitFirefoxInput.onblur = () => {
+        saveNeeded();
+        //Removing non numeric characters with regex clears entire string for some reason
+        let parsed = parseFloat(timeLimitFirefoxInput!.value);
+
+        if (isNaN(parsed) || !isFinite(parsed)) {
+            parsed = 0;
+            timeLimitFirefoxInput!.value = "0";
+        }
+        page_settings!.firefoxTimeLimit = parsed;
+    }
+
+    //Break Time Firefox Input
+    breakTimeFirefoxInput = <HTMLInputElement>panelDocument.getElementById("break-time-firefox")!;
+    breakTimeFirefoxInput.onblur = () => {
+        saveNeeded();
+        //Removing non numeric characters with regex clears entire string for some reason
+        let parsed = parseFloat(breakTimeFirefoxInput!.value);
+
+        if (isNaN(parsed) || !isFinite(parsed)) {
+            parsed = 0;
+            breakTimeFirefoxInput!.value = "0";
+        }
+        page_settings!.firefoxBreakTime = parsed;
     }
 
     //Reset Time Count On Page Button
