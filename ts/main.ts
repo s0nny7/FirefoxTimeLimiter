@@ -51,6 +51,7 @@ var panelDocument: Document | null = null;
 
 let panelContainer: HTMLDivElement | null = null;
 var panel: HTMLIFrameElement | null = null;
+var content: HTMLDivElement | null = null;
 var extendedDivParent: HTMLDivElement | null = null;
 var currentTimeOnPage: HTMLTableCellElement | null = null;
 var currentTimeOnPageRow: HTMLTableRowElement | null = null;
@@ -71,9 +72,25 @@ var timeUpdateIntervalInput: HTMLInputElement | null = null;
 var resetTimeCountAfterInput: HTMLInputElement | null = null;
 var timeLimitFirefoxInput: HTMLInputElement | null = null;
 var breakTimeFirefoxInput: HTMLInputElement | null = null;
+function updatePanelHeight() {
+    if (panel != null) {
+        let rect = panelContainer!.getBoundingClientRect()
+        let extendedRect = extendedDivParent!.getBoundingClientRect()
+        let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
+
+        if (extended) {
+            panelContainer!.style.height = rect.height + "px";
+            panelContainer!.classList.add("com-limitlost-limiter-transition");
+            extendedDivParent!.style.setProperty("height", (advancedRect.top - (extendedRect.top) + advancedRect.height) + "px", "important");
+            panelContainer!.style.setProperty("height", (advancedRect.top + advancedRect.height) + "px", "important");
+        } else {
+            panelContainer!.classList.add("com-limitlost-limiter-transition");
+            panelContainer!.style.setProperty("height", (extendedRect.top) + "px", "important");
+        }
+    }
+}
 
 var extended = false;
-var beforeExtensionHeight = 0;
 
 //Extended Content Variables
 var saveButton: HTMLButtonElement | null = null;
@@ -240,6 +257,8 @@ function formatDuration(millis: number) {
 function createContent() {
     panelDocument = panel!.contentWindow!.document;
 
+    content = <HTMLDivElement>panelDocument.getElementById("content")!;
+
     // Current Time On Page
     currentTimeOnPage = <HTMLTableCellElement>panelDocument.getElementById("current-time-on-page")!;
     currentTimeOnPageRow = <HTMLTableRowElement>currentTimeOnPage.parentElement!;
@@ -287,7 +306,7 @@ function createContent() {
 
     //Extended Content Variables
     extendedDivParent = <HTMLDivElement>panelDocument.getElementById("extended-content");
-    let advancedOptionsLabel = panelDocument.getElementById("extended-advanced");
+    advancedOptionsLabel = <HTMLLabelElement>panelDocument.getElementById("extended-advanced");
     // Extend Button
 
     let extendButton = panelDocument.getElementById("extend-button")!;
@@ -299,14 +318,16 @@ function createContent() {
         if (extended) {
             extendButton.innerText = "Extend";
             panelContainer!.classList.add("com-limitlost-limiter-transition");
-            panelContainer!.style.setProperty("height", (rect.height - extendedRect.height) + "px", "important");
+            panelContainer!.style.setProperty("height", (extendedRect.top) + "px", "important");
             extendedDivParent!.style.setProperty("height", "0px", "important");
+            extendedDivParent!.style.setProperty("max-height", "0px", "important");
             extendedDivParent?.scrollTo(0, 0);
         } else {
             panelContainer!.style.height = rect.height + "px";
             extendButton.innerText = "Hide";
             panelContainer!.classList.add("com-limitlost-limiter-transition");
-            extendedDivParent!.style.setProperty("height", (advancedRect.top - (rect.height - extendedRect.height) + advancedRect.height) + "px", "important");
+            extendedDivParent!.style.maxHeight = "";
+            extendedDivParent!.style.setProperty("height", (advancedRect.top - (extendedRect.top) + advancedRect.height) + "px", "important");
             panelContainer!.style.setProperty("height", (advancedRect.top + advancedRect.height) + "px", "important");
         }
         extended = !extended;
@@ -490,7 +511,8 @@ function createContent() {
 
     let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
 
-    extendedDivParent.style.height = (advancedRect.top + advancedRect.height) + "px";
+    extendedDivParent.style.height = 0 + "px";
+    extendedDivParent.style.setProperty("max-height", "0px", "important");
 }
 
 
@@ -663,12 +685,14 @@ function messageListener(m: any, sender: browser.runtime.MessageSender, sendResp
         if (currentPageBreakTimeLeft < 0 && message.websiteToBreakTimeLeft > 0 && currentTimeLeftPage != null) {
             //Unhide Time Left To Break
             currentTimeLeftPage.parentElement!.style.display = "";
+            updatePanelHeight();
         }
         currentPageBreakTimeLeft = message.websiteToBreakTimeLeft;
         if (currentTimeLeftPage != null) {
             if (currentPageBreakTimeLeft < 0) {
                 //Hide Time Left To Break
                 currentTimeLeftPage.parentElement!.style.display = "none";
+                updatePanelHeight();
             }
             currentTimeLeftPage.innerText = formatDuration(currentPageBreakTimeLeft);
         }
@@ -677,12 +701,14 @@ function messageListener(m: any, sender: browser.runtime.MessageSender, sendResp
         if (currentFirefoxBreakTimeLeft < 0 && message.firefoxToBreakTimeLeft > 0 && currentTimeLeftFirefox != null) {
             //Unhide Time Left To Break
             currentTimeLeftFirefox.parentElement!.style.display = "";
+            updatePanelHeight();
         }
         currentFirefoxBreakTimeLeft = message.firefoxToBreakTimeLeft;
         if (currentTimeLeftFirefox != null) {
             if (currentFirefoxBreakTimeLeft < 0) {
                 //Hide Time Left To Break
                 currentTimeLeftFirefox.parentElement!.style.display = "none";
+                updatePanelHeight();
             }
             currentTimeLeftFirefox.innerText = formatDuration(currentFirefoxBreakTimeLeft);
         }
