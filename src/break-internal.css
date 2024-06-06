@@ -1,0 +1,59 @@
+html {
+    background-color: hwb(0 10% 90% / 0.8);
+    color           : white;
+    height          : 100%;
+}
+
+body {
+    display        : flex;
+    flex-direction : column;
+    flex-wrap      : 1;
+    align-items    : center;
+    justify-content: center;
+    gap            : 1rem;
+    height         : 100%;
+}
+
+.text-shadow {
+    text-shadow: black 0px 0px 15px,
+        black 0px 0px 15px,
+        black 0px 0px 15px,
+        black 0px 0px 15px,
+        black 0px 0px 15px,
+        black 0px 0px 15px;
+}
+
+svg {
+    height      : 5rem;
+    aspect-ratio: 1/1;
+}
+
+svg path {
+    color : white;
+    fill  : white;
+    stroke: white;
+}
+
+#title {
+    font-size: 2rem;
+}
+
+button {
+    background-color: hwb(0 88% 12%);
+    border          : none;
+    border-radius   : 0.5rem;
+    padding         : 0.5rem;
+    text-decoration : none;
+    color           : black;
+    box-shadow      : 2px 6px 11px 0px rgb(116, 116, 116);
+    font-size       : 0.9rem;
+    transition      : background-color 0.2s, box-shadow 0.2s, color 0.2s;
+}
+
+button:hover {
+    background-color: hwb(0 84% 16%);
+}
+
+button:active {
+    background-color: hwb(0 80% 20%);
+}
