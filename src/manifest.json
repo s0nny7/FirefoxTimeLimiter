@@ -44,6 +44,9 @@
     "web_accessible_resources": [
         "global.css",
         "internal.css",
-        "panel.html"
+        "panel.html",
+        "break-panel.html",
+        "break-internal.css"
+
     ]
 }
