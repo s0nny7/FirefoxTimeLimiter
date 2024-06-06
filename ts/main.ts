@@ -51,6 +51,7 @@ var panelDocument: Document | null = null;
 
 let panelContainer: HTMLDivElement | null = null;
 var panel: HTMLIFrameElement | null = null;
+var extendedDivParent: HTMLDivElement | null = null;
 var currentTimeOnPage: HTMLTableCellElement | null = null;
 var currentTimeOnPageRow: HTMLTableRowElement | null = null;
 var currentTimeFirefox: HTMLTableCellElement | null = null;
@@ -285,7 +286,7 @@ function createContent() {
     }
 
     //Extended Content Variables
-    let extendedDivParent = panelDocument.createElement("extended-content");
+    extendedDivParent = <HTMLDivElement>panelDocument.getElementById("extended-content");
     let advancedOptionsLabel = panelDocument.getElementById("extended-advanced");
     // Extend Button
 
@@ -293,18 +294,19 @@ function createContent() {
 
     extendButton.onclick = () => {
         let rect = panelContainer!.getBoundingClientRect()
+        let extendedRect = extendedDivParent!.getBoundingClientRect()
         let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
         if (extended) {
             extendButton.innerText = "Extend";
             panelContainer!.classList.add("com-limitlost-limiter-transition");
-            extendedDivParent.style.setProperty("height", "0px", "important");
-
-            panelContainer!.style.setProperty("height", beforeExtensionHeight + "px", "important");
+            panelContainer!.style.setProperty("height", (rect.height - extendedRect.height) + "px", "important");
+            extendedDivParent!.style.setProperty("height", "0px", "important");
+            extendedDivParent?.scrollTo(0, 0);
         } else {
             panelContainer!.style.height = rect.height + "px";
             extendButton.innerText = "Hide";
             panelContainer!.classList.add("com-limitlost-limiter-transition");
-            extendedDivParent.style.setProperty("height", (advancedRect.top - beforeExtensionHeight + advancedRect.height) + "px", "important");
+            extendedDivParent!.style.setProperty("height", (advancedRect.top - (rect.height - extendedRect.height) + advancedRect.height) + "px", "important");
             panelContainer!.style.setProperty("height", (advancedRect.top + advancedRect.height) + "px", "important");
         }
         extended = !extended;
@@ -610,9 +612,11 @@ async function createPanel() {
 
         createContent();
 
-        beforeExtensionHeight = innerWindow.innerHeight;
+        let rect = panelContainer!.getBoundingClientRect()
+        let extendedRect = extendedDivParent!.getBoundingClientRect()
+
         panelContainer!.style.setProperty("left", `calc(90% - ${panel!.clientWidth}px)`, "important");
-        panelContainer!.style.setProperty("height", beforeExtensionHeight + "px", "important");
+        panelContainer!.style.setProperty("height", (rect.height - extendedRect.height) + "px", "important");
         panelContainer!.style.setProperty("width", `${innerWindow.innerWidth}px`, "important");
     }
 
