@@ -1,11 +1,13 @@
 class PageLimitData {
     regex: boolean = false;
-    limitMillis: number;
-
-    breakMillis: number = -1;
-    constructor(limitMillis: number) {
-        this.limitMillis = limitMillis;
-    }
+    /**
+     * In Minutes
+     */
+    limitTime: number = -1;
+    /**
+     * In Minutes
+     */
+    breakTime: number = -1;
 }
 
 class PageData {
@@ -40,7 +42,13 @@ class Settings {
     countTimeOnLostFocus: boolean | null = null;
     showCurrentTimeFirefox: boolean | null = null;
     showCurrentTimeWebsite: boolean | null = null;
+    /**
+     * In Minutes
+     */
     firefoxTimeLimit: number | null = null;
+    /**
+     * In Minutes
+     */
     firefoxBreakTime: number | null = null;
     websiteTimeLimit: Map<string, PageLimitData> | null = null;
     breakTime: boolean | null = null;

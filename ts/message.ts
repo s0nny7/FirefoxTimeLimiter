@@ -1,3 +1,9 @@
+enum BreakType {
+    None,
+    Website,
+    Firefox
+}
+
 class MessageFromBackground {
     //Settings update
     settings: Settings | null = null;
@@ -22,17 +28,14 @@ class MessageFromBackground {
      */
     websiteToBreakTimeLeft: number | null = null;
 
-    break: boolean | null = null;
+    break: BreakType | null = null;
     /**
      * in Milliseconds
      */
-    breakEnd: number | null = null;
+    breakTimeLeft: number | null = null;
 
     //Special Requests
     alert: string | null = null;
-
-    constructor() {
-    }
 }
 
 class MessageForBackground {

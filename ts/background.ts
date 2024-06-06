@@ -24,6 +24,10 @@ async function background() {
      * In Milliseconds
      */
     var totalFirefoxUseTime = 0;
+    /**
+     * In Milliseconds
+     */
+    var firefoxBreakTimeLeft: number | null = null;
     var totalWebsiteUseTime: Map<string, PageTimeData> = new Map();
     var currentUsed: string | null = null;
     /**
@@ -37,10 +41,11 @@ async function background() {
 
     function loadTimeData() {
         browser.storage.local.get(["totalWebsiteUseTime",
-            "totalFirefoxUseTime", "lastTimeUpdate"]).then((result) => {
+            "totalFirefoxUseTime", "lastTimeUpdate", "firefoxBreakTimeLeft"]).then((result) => {
                 totalWebsiteUseTime = new Map(JSON.parse(result["totalWebsiteUseTime"]))
                 totalFirefoxUseTime = result["totalFirefoxUseTime"] ?? 0;
                 lastTimeUpdate = result["lastTimeUpdate"] ?? nowUtcMillis();
+                firefoxBreakTimeLeft = result["firefoxBreakTimeLeft"] ?? null;
             });
     }
     await loadTimeData();
@@ -49,10 +54,11 @@ async function background() {
         browser.storage.local.set({
             "totalWebsiteUseTime": JSON.stringify(Array.from(totalWebsiteUseTime.entries())),
             "totalFirefoxUseTime": totalFirefoxUseTime,
-            "lastTimeUpdate": lastTimeUpdate
+            "lastTimeUpdate": lastTimeUpdate,
+            "firefoxBreakTimeLeft": firefoxBreakTimeLeft,
         });
     }
-    //Check for reset
+
     function resetTimeData() {
         totalFirefoxUseTime = 0;
         totalWebsiteUseTime = new Map();
@@ -96,24 +102,55 @@ async function background() {
         let matchedUrl = false;
         //Milliseconds
         let foundTime = 0;
+        let foundBreakTimeLeft: number | null = null;
 
-        for (const iterator of totalWebsiteUseTime) {
+        for (const iterator of settings.websiteTimeLimit!) {
             let key = iterator[0]
             let value = iterator[1]
-            if (value.regex_key) {
+            if (value.regex) {
                 let regex = new RegExp(key);
                 if (regex.test(url)) {
                     found = key;
-                    foundTime = value.timeCounted
+                    let timeData = totalWebsiteUseTime.get(found);
+                    if (timeData == null) {
+                        timeData = new PageTimeData(false)
+                        timeData.regex_key = true;
+                        totalWebsiteUseTime.set(key, timeData)
+                    }
+                    foundTime = timeData.timeCounted
+                    foundBreakTimeLeft = timeData.breakTimeLeft
                     matchedUrl = true;
                     break;
                 }
             } else {
                 if (hostname.endsWith(key)) {
                     found = key;
-                    foundTime = value.timeCounted
+                    let timeData = totalWebsiteUseTime.get(found);
+                    if (timeData == null) {
+                        timeData = new PageTimeData(false)
+                        timeData.regex_key = true;
+                        totalWebsiteUseTime.set(key, timeData)
+                    }
+                    foundTime = timeData.timeCounted
+                    foundBreakTimeLeft = timeData.breakTimeLeft
                     matchedUrl = true;
                     break;
+                }
+            }
+        }
+
+        if (!matchedUrl) {
+            for (const iterator of totalWebsiteUseTime) {
+                let key = iterator[0]
+                let value = iterator[1]
+                if (!value.regex_key) {
+                    if (hostname.endsWith(key)) {
+                        found = key;
+                        foundTime = value.timeCounted
+                        foundBreakTimeLeft = value.breakTimeLeft
+                        matchedUrl = true;
+                        break;
+                    }
                 }
             }
         }
@@ -129,6 +166,23 @@ async function background() {
         message.pageTimeUpdate = foundTime;
         message.firefoxTimeUpdate = totalFirefoxUseTime;
         message.pageData = generalPageData.get(found!) ?? new PageData();
+
+        let breakActive = false;
+
+        if (firefoxBreakTimeLeft != null) {
+            message.break = BreakType.Firefox;
+            message.breakTimeLeft = firefoxBreakTimeLeft;
+            breakActive = true;
+        }
+        else if (foundBreakTimeLeft != null) {
+            message.break = BreakType.Website;
+            message.breakTimeLeft = foundBreakTimeLeft;
+            breakActive = true;
+        }
+
+        if (!breakActive) {
+            message.break = BreakType.None;
+        }
 
         message.settings = settings;
 
@@ -185,6 +239,52 @@ async function background() {
         let now = nowUtcMillis();
         let diff = now - lastTimeUpdate;
 
+        //Firefox Break Update
+        if (firefoxBreakTimeLeft != null) {
+            lastTimeUpdate = now;
+            if (firefoxBreakTimeLeft > 0) {
+                firefoxBreakTimeLeft -= diff;
+                if (firefoxBreakTimeLeft <= 0) {
+                    firefoxBreakTimeLeft = null;
+                    totalFirefoxUseTime = 0;
+                }
+            }
+            if (currentUsed != null) {
+                let message = new MessageFromBackground();
+                if (firefoxBreakTimeLeft != null) {
+                    message.break = BreakType.Firefox;
+                    message.breakTimeLeft = firefoxBreakTimeLeft;
+                } else {
+                    message.break = BreakType.None;
+                }
+                browser.tabs.sendMessage(currentPage!, message);
+            }
+            return;
+        }
+
+        //Website Break Update
+        if (currentUsed != null) {
+            let pageData = totalWebsiteUseTime.get(currentUsed);
+            if (pageData != null && pageData.breakTimeLeft != null) {
+                lastTimeUpdate = now;
+                if (pageData.breakTimeLeft > 0) {
+                    pageData.breakTimeLeft -= diff;
+                    if (pageData.breakTimeLeft <= 0) {
+                        pageData.breakTimeLeft = null;
+                    }
+                }
+                let message = new MessageFromBackground();
+                if (pageData.breakTimeLeft != null) {
+                    message.break = BreakType.Website;
+                    message.breakTimeLeft = pageData.breakTimeLeft;
+                } else {
+                    message.break = BreakType.None;
+                }
+                browser.tabs.sendMessage(currentPage!, message);
+                return;
+            }
+        }
+
         if (!settings.countTimeOnLostFocus && !firefoxActive) {
             return;
         }
@@ -203,6 +303,50 @@ async function background() {
 
             if (currentUsed != null) {
                 let message = new MessageFromBackground();
+
+                //Check For Firefox Time Limit
+                if (settings.firefoxTimeLimit! > 0) {
+                    let timeLimitMillis = settings.firefoxTimeLimit! * 60_000
+                    if (totalFirefoxUseTime > timeLimitMillis) {
+                        message.firefoxToBreakTimeLeft = -1;
+
+                        message.break = BreakType.Firefox;
+                        if (settings.firefoxBreakTime! > 0) {
+                            firefoxBreakTimeLeft = settings.firefoxBreakTime! * 60_000;
+                        } else {
+                            firefoxBreakTimeLeft = -1;
+                        }
+                        message.breakTimeLeft = firefoxBreakTimeLeft;
+                    } else {
+                        message.firefoxToBreakTimeLeft = timeLimitMillis - totalFirefoxUseTime;
+                    }
+                }
+
+                //Check For Website Time Limit
+                let pageLimitData = settings.websiteTimeLimit!.get(currentUsed);
+                if (pageLimitData != null) {
+                    if (pageLimitData.limitTime > 0) {
+                        let timeLimitMillis = pageLimitData.limitTime * 60_000
+                        let websiteUseTime = totalWebsiteUseTime.get(currentUsed)!
+                        let timeCounted = websiteUseTime.timeCounted ?? 0
+
+                        if (timeCounted > timeLimitMillis) {
+                            message.websiteToBreakTimeLeft = -1;
+
+                            message.break = BreakType.Website;
+                            if (pageLimitData.breakTime > 0) {
+                                websiteUseTime.breakTimeLeft = pageLimitData.breakTime * 60_000;
+                            } else {
+                                websiteUseTime.breakTimeLeft = -1;
+                            }
+                            message.breakTimeLeft = websiteUseTime.breakTimeLeft;
+                        } else {
+                            message.websiteToBreakTimeLeft = timeLimitMillis - timeCounted;
+                        }
+                    }
+                }
+
+
 
                 let pageData = totalWebsiteUseTime.get(currentUsed);
                 if (pageData != null) {
@@ -269,6 +413,29 @@ async function background() {
                 clearInterval(timeUpdateInterval)
                 timeUpdateInterval = setInterval(timeUpdate, message.settings.updateTimerPerMiliseconds!)
             }
+            if (currentPage != null) {
+                if (message.settings.firefoxTimeLimit != settings.firefoxTimeLimit) {
+                    let response = new MessageFromBackground();
+                    response.firefoxToBreakTimeLeft = message.settings!.firefoxTimeLimit! * 60_000 - totalFirefoxUseTime;
+                    browser.tabs.sendMessage(currentPage, response);
+                }
+                let totalUseTime = totalWebsiteUseTime.get(currentUsed!);
+                if (totalUseTime != null) {
+                    let oldLimitTime = message.settings.websiteTimeLimit?.get(currentUsed!);
+                    let newLimitTime = settings.websiteTimeLimit?.get(currentUsed!)
+
+                    if (oldLimitTime?.limitTime != newLimitTime?.limitTime) {
+                        let response = new MessageFromBackground();
+                        if (newLimitTime != null) {
+                            response.websiteToBreakTimeLeft = newLimitTime!.limitTime * 60_000 - totalUseTime.timeCounted;
+                        } else {
+                            response.websiteToBreakTimeLeft = -1;
+                        }
+                        browser.tabs.sendMessage(currentPage, response);
+                    }
+                }
+            }
+
             settings = Object.assign(new Settings(), message.settings);
             settings.save();
         }
@@ -282,13 +449,55 @@ async function background() {
             initializePage(currentPage, new URL(message.pageUrl).hostname, message.pageUrl)
         }
 
+        if (message.stopBreak == true) {
+            //Firefox Update
+            if (firefoxBreakTimeLeft != null) {
+                firefoxBreakTimeLeft = null;
+                totalFirefoxUseTime = 0;
+                if (currentPage != null) {
+                    let message = new MessageFromBackground()
+                    message.break = BreakType.None;
+                    browser.tabs.sendMessage(currentPage!, message)
+                }
+                saveTimeData();
+            }
+            //Website Update
+            if (currentUsed != null) {
+                let pageData = totalWebsiteUseTime.get(currentUsed);
+                if (pageData != null && pageData.breakTimeLeft != null) {
+                    pageData.breakTimeLeft = null;
+                    let message = new MessageFromBackground()
+                    message.break = BreakType.None;
+                    browser.tabs.sendMessage(currentPage!, message)
+                    saveTimeData();
+                }
+            }
+        }
+
         if (message.resetTimeCountFirefox == true) {
             totalFirefoxUseTime = 0;
+            if (firefoxBreakTimeLeft != null) {
+                firefoxBreakTimeLeft = null;
+                if (currentPage != null) {
+                    let message = new MessageFromBackground()
+                    message.break = BreakType.None;
+                    browser.tabs.sendMessage(currentPage!, message)
+                }
+            }
             saveTimeData();
         }
 
         if (message.resetTimeCountPage == true) {
-            totalWebsiteUseTime.get(currentUsed!)!.timeCounted = 0;
+            let pageData = totalWebsiteUseTime.get(currentUsed!)
+            if (pageData != null) {
+                pageData.timeCounted = 0;
+                if (pageData.breakTimeLeft != null) {
+                    pageData.breakTimeLeft = null;
+                    let message = new MessageFromBackground()
+                    message.break = BreakType.None;
+                    browser.tabs.sendMessage(currentPage!, message)
+                }
+            }
             saveTimeData();
         }
     }

@@ -16,7 +16,7 @@ class PageTimeData {
     /**
      * in Milliseconds
      */
-    breakTimeLeft: number = -1;
+    breakTimeLeft: number | null = null;
 
     constructor(auto_created: boolean) {
         this.auto_created = auto_created;
