@@ -36,6 +36,7 @@ var oldSizeHeight = "";
 
 //Variables and checks needed for iframe transparency
 var colorSchemeMeta: HTMLMetaElement | null = null;
+var colorSchemeMeta2: HTMLMetaElement | null = null;
 var metaDarkMode = false;
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
     metaDarkMode = event.matches;
@@ -44,6 +45,9 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', eve
     }
     if (colorSchemeMeta != null) {
         colorSchemeMeta.content = metaDarkMode ? "dark" : "light";
+    }
+    if (colorSchemeMeta2 != null) {
+        colorSchemeMeta2.content = metaDarkMode ? "dark" : "light";
     }
 });
 
@@ -73,6 +77,13 @@ var resetTimeCountAfterInput: HTMLInputElement | null = null;
 var timeLimitFirefoxInput: HTMLInputElement | null = null;
 var breakTimeFirefoxInput: HTMLInputElement | null = null;
 var advancedOptionsLabel: HTMLLabelElement | null = null;
+
+var breakPanel: HTMLIFrameElement | null = null;
+var breakType: BreakType = BreakType.None;
+var breakExitTimeout: number | null = null;
+var breakTypeSpan: HTMLSpanElement | null = null;
+var breakPanelTimeLeft: HTMLSpanElement | null = null;
+
 function updatePanelHeight() {
     if (panel != null) {
         let rect = panelContainer!.getBoundingClientRect()
@@ -89,6 +100,95 @@ function updatePanelHeight() {
             panelContainer!.style.setProperty("height", (extendedRect.top) + "px", "important");
         }
     }
+}
+
+function enterBreak(breakTimeLeft: number) {
+    if (breakPanel == null) {
+        let old = document.getElementById("com-limitlost-limiter-break-panel")
+        //Remove Old Panel If it Already Exists
+        if (old != null) {
+            old.remove();
+        }
+
+        breakPanel = document.createElement("iframe");
+        breakPanel.id = "com-limitlost-limiter-break-panel";
+        document.body.appendChild(breakPanel);
+        if (page_settings?.animations) {
+            breakPanel.classList.add("com-limitlost-limiter-animated");
+        }
+
+        breakPanel.onload = () => {
+            let innerWindow = breakPanel!.contentWindow!
+            let innerDocument = innerWindow.document
+
+            //Dark mode meta update
+            metaDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+            if (pageData?.fixTransparency) {
+                metaDarkMode = !metaDarkMode
+            }
+            colorSchemeMeta2 = innerDocument.getElementById("meta-color-scheme") as HTMLMetaElement;
+            colorSchemeMeta2.content = metaDarkMode ? "dark" : "light";
+
+            style(innerDocument, "break-internal.css");
+
+            //Break Type Span
+            breakTypeSpan = innerDocument.getElementById("break-type") as HTMLSpanElement;
+            breakTypeSpan.innerText = breakType == BreakType.Website ? "Website" : "Firefox";
+            //Break Time Left Span
+            breakPanelTimeLeft = innerDocument.getElementById("break-time-left") as HTMLSpanElement;
+            if (breakTimeLeft > 0) {
+                breakPanelTimeLeft.innerText = formatDuration(breakTimeLeft);
+                breakPanelTimeLeft.parentElement!.style.display = "";
+            } else {
+                breakPanelTimeLeft.parentElement!.style.display = "none";
+            }
+
+            //Stop Break Button
+            let stopBreakButton = <HTMLButtonElement>innerDocument.getElementById("stop-break-button")!;
+            stopBreakButton.onclick = () => {
+                let message = new MessageForBackground();
+                message.stopBreak = true;
+
+                browser.runtime.sendMessage(message);
+            }
+
+            breakPanel?.style.setProperty("opacity", "1", "important");
+        }
+        breakPanel.src = browser.runtime.getURL("break-panel.html");
+    } else {
+        if (breakExitTimeout != null) {
+            breakPanel.style.setProperty("opacity", "1", "important");
+            clearTimeout(breakExitTimeout);
+            breakExitTimeout = null;
+        }
+        //Update Break Type
+        breakTypeSpan!.innerText = breakType == BreakType.Website ? "Website" : "Firefox";
+        //Update break time left
+        if (breakTimeLeft > 0) {
+            breakPanelTimeLeft!.innerText = formatDuration(breakTimeLeft);
+            breakPanelTimeLeft!.parentElement!.style.display = "";
+        } else {
+            breakPanelTimeLeft!.parentElement!.style.display = "none";
+        }
+    }
+
+}
+
+function exitBreak() {
+    if (breakExitTimeout == null && breakPanel != null) {
+        breakPanel?.style.setProperty("opacity", "0", "important");
+        breakExitTimeout = setTimeout(() => {
+            if (breakPanel != null) {
+                breakPanel.remove();
+                colorSchemeMeta2 = null;
+                breakTypeSpan = null;
+                breakPanelTimeLeft = null
+                breakPanel = null;
+            }
+            breakExitTimeout = null;
+        }, 200);
+    }
+
 }
 
 var extended = false;
@@ -149,7 +249,10 @@ function applySettings() {
     if (panel != null && page_settings != null) {
         //Animations
         animationsCheckBox!.checked = page_settings.animations!;
-        panelContainer!.classList.toggle("com-limitlost-limiter-animated", page_settings.animations!)
+        panelContainer!.classList.toggle("com-limitlost-limiter-animated", page_settings.animations!);
+        if (breakPanel != null) {
+            breakPanel!.classList.toggle("com-limitlost-limiter-animated", page_settings.animations!);
+        }
         panelDocument!.body.parentElement!.classList.toggle("no-animations", !page_settings.animations!);
         //Dark Mode
         darkModeCheckBox!.checked = page_settings.darkMode!;
@@ -187,12 +290,12 @@ function applySettings() {
     }
 }
 
-function style(doc: Document) {
+function style(doc: Document, css_file_name: string = "internal.css") {
     let style = doc.createElement("link");
 
     style.rel = "stylesheet"
 
-    style.href = browser.runtime.getURL("internal.css");
+    style.href = browser.runtime.getURL(css_file_name);
 
     doc.head.appendChild(style);
 }
@@ -364,6 +467,9 @@ function createContent() {
         page_settings!.animations = animationsCheckBox?.checked ?? false;
 
         panelContainer!.classList.toggle("com-limitlost-limiter-animated", page_settings!.animations!)
+        if (breakPanel != null) {
+            breakPanel!.classList.toggle("com-limitlost-limiter-animated", page_settings!.animations!)
+        }
         panelDocument!.body.parentElement!.classList.toggle("no-animations", !page_settings!.animations!);
     }
 
@@ -384,6 +490,9 @@ function createContent() {
             metaDarkMode = !metaDarkMode
         }
         colorSchemeMeta!.content = metaDarkMode ? "dark" : "light";
+        if (colorSchemeMeta2 != null) {
+            colorSchemeMeta2!.content = metaDarkMode ? "dark" : "light";
+        }
 
         pageDataUpdate();
     }
@@ -717,6 +826,15 @@ function messageListener(m: any, sender: browser.runtime.MessageSender, sendResp
 
     if (message.alert) {
         alert(message.alert)
+    }
+
+    if (message.break != null) {
+        breakType = message.break;
+        if (breakType == BreakType.None) {
+            exitBreak();
+        } else {
+            enterBreak(message.breakTimeLeft!);
+        }
     }
 
     if (first && page_settings != null) {
