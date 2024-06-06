@@ -72,6 +72,7 @@ var timeUpdateIntervalInput: HTMLInputElement | null = null;
 var resetTimeCountAfterInput: HTMLInputElement | null = null;
 var timeLimitFirefoxInput: HTMLInputElement | null = null;
 var breakTimeFirefoxInput: HTMLInputElement | null = null;
+var advancedOptionsLabel: HTMLLabelElement | null = null;
 function updatePanelHeight() {
     if (panel != null) {
         let rect = panelContainer!.getBoundingClientRect()
