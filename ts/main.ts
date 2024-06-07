@@ -55,7 +55,7 @@ var panelDocument: Document | null = null;
 
 let panelContainer: HTMLDivElement | null = null;
 var panel: HTMLIFrameElement | null = null;
-var content: HTMLDivElement | null = null;
+var content: HTMLFormElement | null = null;
 var extendedDivParent: HTMLDivElement | null = null;
 var currentTimeOnPage: HTMLTableCellElement | null = null;
 var currentTimeOnPageRow: HTMLTableRowElement | null = null;
@@ -77,6 +77,10 @@ var resetTimeCountAfterInput: HTMLInputElement | null = null;
 var timeLimitFirefoxInput: HTMLInputElement | null = null;
 var breakTimeFirefoxInput: HTMLInputElement | null = null;
 var advancedOptionsLabel: HTMLLabelElement | null = null;
+var newPageRuleRow: HTMLTableRowElement | null = null;
+var templatePageRuleRow: HTMLTableRowElement | null = null;
+
+var pageRulesResizeObserver: ResizeObserver | null = null;
 
 var breakPanel: HTMLIFrameElement | null = null;
 var breakType: BreakType = BreakType.None;
@@ -245,6 +249,162 @@ function applyPageData() {
     }
 }
 
+function getNewPageName() {
+    let currentName = "new Rule";
+    let current_i = 1
+    while (true) {
+        let found = false;
+        for (const iterator of templatePageRuleRow!.parentNode!.children!) {
+            let el = iterator as HTMLTableRowElement;
+            let pageNameI = <HTMLInputElement | null>el.getElementsByClassName("page-name")[0]
+            if (pageNameI != null && pageNameI.value == currentName) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            break;
+        } else {
+            current_i++;
+            currentName = `new Rule ${current_i}`;
+        }
+    }
+    return currentName;
+
+}
+
+function createPageRuleRow(saved: boolean, regex: boolean = false, page_name: string = "", time_limit: number = -1, break_length: number = -1) {
+    let newRow = templatePageRuleRow!.cloneNode(true) as HTMLTableRowElement;
+    newRow.id = "";
+    newRow.classList.add("created-page-rule")
+
+
+    let removeButton = <HTMLButtonElement>newRow.getElementsByClassName("remove-button")[0]
+    let regexButton = <HTMLButtonElement>newRow.getElementsByClassName("regex-button")[0]
+    let pageNameInput = <HTMLInputElement>newRow.getElementsByClassName("page-name")[0]
+    let pageTimeLimitInput = <HTMLInputElement>newRow.getElementsByClassName("page-time-limit")[0]
+    let pageBreakLengthInput = <HTMLInputElement>newRow.getElementsByClassName("page-break-length")[0]
+    //Remove Button
+    removeButton.onclick = () => {
+        page_settings!.websiteTimeLimit!.delete(pageNameInput.value);
+        saveNeeded();
+
+        newRow.remove();
+    }
+    //Regex Button
+    if (regex) {
+        regexButton.classList.add("active")
+    }
+    regexButton.onclick = () => {
+        let settings = page_settings!.websiteTimeLimit!.get(pageNameInput.value)!
+        if (regexButton.classList.contains("active")) {
+            settings.regex = false;
+            regexButton.classList.remove("active")
+        } else {
+            settings.regex = true
+            regexButton.classList.add("active")
+        }
+        saveNeeded();
+    }
+    //Page Name Input
+    let currentPageName = page_name
+    if (currentPageName == "" && !saved) {
+        currentPageName = getNewPageName();
+    }
+
+    let textBefore = currentPageName
+    pageNameInput.value = currentPageName;
+    function updateLocks(name: string, disabled: boolean) {
+        let foundDuplicates = []
+        for (const iterator of templatePageRuleRow!.parentNode!.children!) {
+            let el = iterator as HTMLTableRowElement;
+            let pageNameI = <HTMLInputElement | null>el.getElementsByClassName("page-name")[0]
+            if (pageNameI != null && pageNameI.value == name) {
+                foundDuplicates.push(el);
+            }
+        }
+        let tooMuch = foundDuplicates.length > 1
+        if (tooMuch || !disabled) {
+            for (const iterator of foundDuplicates) {
+                let el = iterator as HTMLTableRowElement;
+                (<HTMLButtonElement>el.getElementsByClassName("remove-button")[0]).disabled = disabled;
+                (<HTMLButtonElement>el.getElementsByClassName("regex-button")[0]).disabled = disabled;
+                (<HTMLInputElement>el.getElementsByClassName("page-time-limit")[0]).disabled = disabled;
+                (<HTMLInputElement>el.getElementsByClassName("page-break-length")[0]).disabled = disabled;
+                let pageNameI = <HTMLInputElement>el.getElementsByClassName("page-name")[0]
+                if (disabled) {
+                    pageNameI.classList.add("invalid")
+                    pageNameI.setCustomValidity("Duplicate Page Name")
+                } else {
+                    pageNameI.classList.remove("invalid")
+                    pageNameI.setCustomValidity("")
+                }
+            }
+
+        }
+        return tooMuch;
+    }
+    pageNameInput.onchange = () => {
+        removeButton.disabled = false;
+        regexButton.disabled = false;
+        pageTimeLimitInput.disabled = false;
+        pageBreakLengthInput.disabled = false;
+        pageNameInput.setCustomValidity("")
+        pageNameInput.classList.remove("invalid")
+
+        updateLocks(textBefore, false);
+        let tooMuch = updateLocks(pageNameInput.value, true);
+        if (!tooMuch) {
+            saveNeeded();
+            let oldName = newRow.getAttribute("settings-name")!
+            newRow.setAttribute("settings-name", pageNameInput.value)
+            //Move data from one key to another
+            let data = page_settings!.websiteTimeLimit!.get(oldName);
+            page_settings!.websiteTimeLimit!.delete(oldName)
+            page_settings!.websiteTimeLimit!.set(pageNameInput.value, data!);
+        }
+        textBefore = pageNameInput.value;
+    }
+    //Page Time Limit Input
+    pageTimeLimitInput.value = time_limit.toString();
+    pageTimeLimitInput.onchange = () => {
+        saveNeeded();
+        //Removing non numeric characters with regex clears entire string for some reason
+        let parsed = parseFloat(pageTimeLimitInput!.value);
+
+        if (isNaN(parsed) || !isFinite(parsed)) {
+            parsed = 0;
+            pageTimeLimitInput!.value = "0";
+        }
+        page_settings!.websiteTimeLimit!.get(pageNameInput.value)!.limitTime = parsed;
+    }
+    //Page Break Length Input
+    pageBreakLengthInput.value = break_length.toString();
+    pageBreakLengthInput.onchange = () => {
+        saveNeeded();
+        //Removing non numeric characters with regex clears entire string for some reason
+        let parsed = parseFloat(pageBreakLengthInput!.value);
+
+        if (isNaN(parsed) || !isFinite(parsed)) {
+            parsed = 0;
+            pageBreakLengthInput!.value = "0";
+        }
+        page_settings!.websiteTimeLimit!.get(pageNameInput.value)!.breakTime = parsed;
+    }
+
+    newPageRuleRow!.before(newRow);
+    if (!saved) {
+        saveNeeded();
+        let data = new PageLimitData()
+        data.regex = regex
+        data.limitTime = time_limit
+        data.breakTime = break_length;
+        page_settings!.websiteTimeLimit!.set(currentPageName, data);
+    }
+    newRow.setAttribute("settings-name", currentPageName);
+    updateLocks(textBefore, true);
+}
+
 function applySettings() {
     if (panel != null && page_settings != null) {
         //Animations
@@ -285,6 +445,15 @@ function applySettings() {
         timeLimitFirefoxInput!.value = page_settings.firefoxTimeLimit!.toString();
         //Break Time Firefox
         breakTimeFirefoxInput!.value = page_settings.firefoxBreakTime!.toString();
+        //Page Rules
+        for (const item of newPageRuleRow!.parentElement!.children) {
+            if (item.classList.contains("created-page-rule")) {
+                item.remove();
+            }
+        }
+        for (const [key, value] of page_settings.websiteTimeLimit!) {
+            createPageRuleRow(true, value.regex, key, value.limitTime, value.breakTime);
+        }
 
         saveNotNeeded();
     }
@@ -361,7 +530,7 @@ function formatDuration(millis: number) {
 function createContent() {
     panelDocument = panel!.contentWindow!.document;
 
-    content = <HTMLDivElement>panelDocument.getElementById("content")!;
+    content = <HTMLFormElement>panelDocument.getElementById("content")!;
 
     // Current Time On Page
     currentTimeOnPage = <HTMLTableCellElement>panelDocument.getElementById("current-time-on-page")!;
@@ -453,11 +622,13 @@ function createContent() {
     // Save Button
     saveButton = <HTMLButtonElement>panelDocument.getElementById("save-button")!;
     saveButton.onclick = () => {
-        saveNotNeeded();
+        if (content!.reportValidity()) {
+            saveNotNeeded();
 
-        let message = new MessageForBackground();
-        message.settings = page_settings;
-        browser.runtime.sendMessage(message);
+            let message = new MessageForBackground();
+            message.settings = page_settings;
+            browser.runtime.sendMessage(message);
+        }
     }
 
     // Animations Checkbox
@@ -560,6 +731,27 @@ function createContent() {
         }
         page_settings!.firefoxBreakTime = parsed;
     }
+
+    //Page Rules Table
+    let pageRulesTableParent = panelDocument.getElementById("page-rules-table-parent")!
+    newPageRuleRow = <HTMLTableRowElement>panelDocument.getElementById("new-page-rule-row")!;
+    templatePageRuleRow = <HTMLTableRowElement>panelDocument.getElementById("page-rule-template")!;
+
+    let newPageRuleButton = panelDocument.getElementById("new-page-rule-button")!;
+    pageRulesResizeObserver = new ResizeObserver(() => {
+        let rect = pageRulesTableParent.getBoundingClientRect();
+        newPageRuleButton.style.width = rect.width + "px";
+    })
+
+    pageRulesResizeObserver.observe(pageRulesTableParent)
+
+    //New Page Rule Button
+    let rect = pageRulesTableParent.getBoundingClientRect();
+    newPageRuleButton.style.width = rect.width + "px";
+    newPageRuleButton.onclick = () => {
+        createPageRuleRow(false);
+    }
+
 
     //Reset Time Count On Page Button
     let resetTimeCountOnPageButton = panelDocument.getElementById("reset-page-time")!;
