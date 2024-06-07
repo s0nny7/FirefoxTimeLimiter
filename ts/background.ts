@@ -263,26 +263,31 @@ async function background() {
         }
 
         //Website Break Update
-        if (currentUsed != null) {
-            let pageData = totalWebsiteUseTime.get(currentUsed);
-            if (pageData != null && pageData.breakTimeLeft != null) {
-                lastTimeUpdate = now;
-                if (pageData.breakTimeLeft > 0) {
-                    pageData.breakTimeLeft -= diff;
-                    if (pageData.breakTimeLeft <= 0) {
-                        pageData.breakTimeLeft = null;
+        let currentPageBreak = false;
+        for (const [key, value] of totalWebsiteUseTime) {
+            if (value.breakTimeLeft != null) {
+                if (value.breakTimeLeft > 0) {
+                    value.breakTimeLeft -= diff;
+                    if (value.breakTimeLeft <= 0) {
+                        value.breakTimeLeft = null;
                     }
                 }
-                let message = new MessageFromBackground();
-                if (pageData.breakTimeLeft != null) {
-                    message.break = BreakType.Website;
-                    message.breakTimeLeft = pageData.breakTimeLeft;
-                } else {
-                    message.break = BreakType.None;
+                if (currentUsed == key) {
+                    let message = new MessageFromBackground();
+                    if (value.breakTimeLeft != null) {
+                        message.break = BreakType.Website;
+                        message.breakTimeLeft = value.breakTimeLeft;
+                    } else {
+                        message.break = BreakType.None;
+                    }
+                    browser.tabs.sendMessage(currentPage!, message);
+                    currentPageBreak = true;
                 }
-                browser.tabs.sendMessage(currentPage!, message);
-                return;
             }
+        }
+        if (currentPageBreak) {
+            lastTimeUpdate = now;
+            return;
         }
 
         if (!settings.countTimeOnLostFocus && !firefoxActive) {
