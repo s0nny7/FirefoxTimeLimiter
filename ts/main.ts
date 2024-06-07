@@ -79,6 +79,7 @@ var breakTimeFirefoxInput: HTMLInputElement | null = null;
 var advancedOptionsLabel: HTMLLabelElement | null = null;
 var newPageRuleRow: HTMLTableRowElement | null = null;
 var templatePageRuleRow: HTMLTableRowElement | null = null;
+var countTimeOnLostFocusCheckBox: HTMLInputElement | null = null;
 
 var panelResizeObserver: ResizeObserver | null = null;
 var pageRulesResizeObserver: ResizeObserver | null = null;
@@ -446,6 +447,8 @@ function applySettings() {
         timeLimitFirefoxInput!.value = page_settings.firefoxTimeLimit!.toString();
         //Break Time Firefox
         breakTimeFirefoxInput!.value = page_settings.firefoxBreakTime!.toString();
+        //Count Time On Lost Focus
+        countTimeOnLostFocusCheckBox!.checked = page_settings.countTimeOnLostFocus!;
         //Page Rules
         for (const item of newPageRuleRow!.parentElement!.children) {
             if (item.classList.contains("created-page-rule")) {
@@ -801,6 +804,12 @@ function createContent() {
         saveNeeded();
         page_settings!.backgroundTransparency = parseFloat(backgroundTransparencySlider!.value) / 100;
         panelDocument!.body.parentElement!.style.setProperty("--background-opacity", page_settings!.backgroundTransparency.toString());
+    }
+    //Count Time While Unfocused Checkbox
+    countTimeOnLostFocusCheckBox = <HTMLInputElement>panelDocument.getElementById("count-time-on-lost-focus")!;
+    countTimeOnLostFocusCheckBox.onchange = () => {
+        saveNeeded();
+        page_settings!.countTimeOnLostFocus = countTimeOnLostFocusCheckBox!.checked;
     }
 
     //Time Update Interval
