@@ -665,7 +665,9 @@ function createContent() {
             colorSchemeMeta2!.content = metaDarkMode ? "dark" : "light";
         }
 
-        pageDataUpdate();
+        let message = new MessageForBackground();
+        message.pageData = pageData;
+        browser.runtime.sendMessage(message);
     }
     // Show Firefox Time Checkbox
     showFirefoxTimeCheckBox = <HTMLInputElement>panelDocument.getElementById("show-firefox-time-checkbox")!;
