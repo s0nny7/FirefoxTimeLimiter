@@ -80,6 +80,7 @@ var advancedOptionsLabel: HTMLLabelElement | null = null;
 var newPageRuleRow: HTMLTableRowElement | null = null;
 var templatePageRuleRow: HTMLTableRowElement | null = null;
 
+var panelResizeObserver: ResizeObserver | null = null;
 var pageRulesResizeObserver: ResizeObserver | null = null;
 
 var breakPanel: HTMLIFrameElement | null = null;
@@ -218,24 +219,23 @@ function pageDataUpdate() {
             let message = new MessageForBackground();
             message.pageData = pageData;
             browser.runtime.sendMessage(message);
+            pageDataTimeout = null;
         }, 1000);
     }
 }
 
 function applyPageData() {
-    if (panel != null && pageData != null) {
+    if (panelContainer != null && pageData != null) {
         if (extended) {
-            panel.style.width = pageData.widthExtended + "px";
-            panel.style.height = pageData.heightExtended + "px";
+            panelContainer.style.setProperty("width", pageData.widthExtended + "px", "important");
         } else {
-            panel.style.width = pageData.width + "px";
-            panel.style.height = pageData.height + "px";
+            panelContainer.style.setProperty("width", pageData.width + "px", "important");
         }
         if (pageData.positionX != null) {
-            panel.style.left = pageData.positionX + "%"
+            panelContainer.style.setProperty("left", pageData.positionX + "%", "important");
         }
         if (pageData.positionY != null) {
-            panel.style.top = pageData.positionY + "%"
+            panelContainer.style.setProperty("top", pageData.positionY + "%", "important");
         }
         fixTransparencyCheckBox!.checked = pageData.fixTransparency;
         if (colorSchemeMeta != null) {
@@ -403,6 +403,7 @@ function createPageRuleRow(saved: boolean, regex: boolean = false, page_name: st
     }
     newRow.setAttribute("settings-name", currentPageName);
     updateLocks(textBefore, true);
+    updatePanelHeight();
 }
 
 function applySettings() {
@@ -590,18 +591,31 @@ function createContent() {
         let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
         if (extended) {
             extendButton.innerText = "Extend";
+            if (panelContainer!.style.width == "") {
+                panelContainer!.style.setProperty("width", rect.width + "px", "important");
+            }
             panelContainer!.classList.add("com-limitlost-limiter-transition");
             panelContainer!.style.setProperty("height", (extendedRect.top) + "px", "important");
+            if (pageData!.width != null) {
+                panelContainer!.style.setProperty("width", pageData!.width + "px", "important");
+            }
             extendedDivParent!.style.setProperty("height", "0px", "important");
             extendedDivParent!.style.setProperty("max-height", "0px", "important");
             extendedDivParent?.scrollTo(0, 0);
+
         } else {
-            panelContainer!.style.height = rect.height + "px";
+            if (panelContainer!.style.width == "") {
+                panelContainer!.style.setProperty("width", rect.width + "px", "important");
+            }
+            panelContainer!.style.setProperty("height", rect.height + "px", "important");
             extendButton.innerText = "Hide";
             panelContainer!.classList.add("com-limitlost-limiter-transition");
             extendedDivParent!.style.maxHeight = "";
             extendedDivParent!.style.setProperty("height", (advancedRect.top - (extendedRect.top) + advancedRect.height) + "px", "important");
             panelContainer!.style.setProperty("height", (advancedRect.top + advancedRect.height) + "px", "important");
+            if (pageData!.widthExtended != null) {
+                panelContainer!.style.setProperty("width", pageData!.widthExtended + "px", "important");
+            }
         }
         extended = !extended;
     }
@@ -813,8 +827,6 @@ function createContent() {
     applySettings();
     applyPageData();
 
-    let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
-
     extendedDivParent.style.height = 0 + "px";
     extendedDivParent.style.setProperty("max-height", "0px", "important");
 }
@@ -830,6 +842,20 @@ async function createPanel() {
 
     panelContainer = document.createElement("div");
     panelContainer.id = "com-limitlost-limiter-panel-container"
+    panelContainer.classList.add("com-limitlost-limiter-initializing")
+
+    panelResizeObserver = new ResizeObserver(() => {
+        if (!panelContainer?.classList.contains("com-limitlost-limiter-transition") && !panelContainer?.classList.contains("com-limitlost-limiter-initializing")) {
+            let rect = panelContainer!.getBoundingClientRect()
+            if (extended) {
+                pageData!.widthExtended = rect.width
+            } else {
+                pageData!.width = rect.width
+            }
+            pageDataUpdate()
+        }
+    })
+    panelResizeObserver.observe(panelContainer);
 
     //Add Static limiter panel above everything
     panel = document.createElement("iframe");
@@ -889,12 +915,16 @@ async function createPanel() {
                 let topOffset;
                 //Top bounds check
                 if (topOffsetPx + panelContainer!.offsetHeight > window.innerHeight) {
-                    topOffsetPx = (window.innerHeight - panelContainer!.offsetHeight) / window.innerHeight * 100
+                    topOffset = (window.innerHeight - panelContainer!.offsetHeight) / window.innerHeight * 100
                 } else if (topOffsetPx < 0) {
                     topOffset = 0
                 } else {
                     topOffset = topOffsetPx / window.innerHeight * 100
                 }
+
+                pageData!.positionX = leftOffset;
+                pageData!.positionY = topOffset;
+                pageDataUpdate();
 
 
                 panelContainer!.style.setProperty("left", leftOffset + '%', "important");
@@ -941,9 +971,21 @@ async function createPanel() {
         let rect = panelContainer!.getBoundingClientRect()
         let extendedRect = extendedDivParent!.getBoundingClientRect()
 
-        panelContainer!.style.setProperty("left", `calc(90% - ${panel!.clientWidth}px)`, "important");
+        let width = pageData?.width;
+        if (width == null) {
+            width = panel!.clientWidth;
+        }
+        if (pageData?.positionX == null) {
+            panelContainer!.style.setProperty("left", `calc(90% - ${width}px)`, "important");
+        } else {
+            panelContainer!.style.setProperty("left", `${pageData?.positionX}%`, "important");
+        }
+        if (pageData?.positionY != null) {
+            panelContainer!.style.setProperty("top", `${pageData?.positionY}%`, "important");
+        }
         panelContainer!.style.setProperty("height", (rect.height - extendedRect.height) + "px", "important");
-        panelContainer!.style.setProperty("width", `${innerWindow.innerWidth}px`, "important");
+        panelContainer!.style.setProperty("width", `${width}px`, "important");
+        panelContainer!.classList.remove("com-limitlost-limiter-initializing")
     }
 
     panelContainer.appendChild(panel);

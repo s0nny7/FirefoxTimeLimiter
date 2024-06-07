@@ -13,13 +13,9 @@ class PageLimitData {
 class PageData {
     positionX: number | null = null;
     positionY: number | null = null;
-    height: number | null = null;
     width: number | null = null;
-    heightExtended: number | null = null;
     widthExtended: number | null = null;
     fixTransparency: boolean = false;
-    constructor() {
-    }
 }
 
 class PageBreakData {
