@@ -286,6 +286,7 @@ async function background() {
         }
 
         if (!settings.countTimeOnLostFocus && !firefoxActive) {
+            lastTimeUpdate = now;
             return;
         }
 
