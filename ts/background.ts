@@ -2,6 +2,36 @@ async function background() {
     var settings = new Settings();
     await settings.load();
 
+    /**
+     * Map Values need to be objects, without any nested objects 
+     */
+    function mapsAreEqual(m1: Map<any, any>, m2: Map<any, any>) {
+
+        if (m1.size != m2.size) {
+            return false;
+        }
+
+        for (const key of m1.keys()) {
+            let m1Obj = m1.get(key)
+            let m2Obj = m2.get(key)
+            if (m2Obj == null) {
+                return false;
+            }
+            for (const key2 in m1Obj) {
+                if (Object.prototype.hasOwnProperty.call(m1Obj, key2)) {
+                    type ObjKey = keyof typeof m1Obj;
+                    let element = m1Obj[key2 as ObjKey];
+                    let element2 = m2Obj[key2 as ObjKey];
+                    if (element !== element2) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true
+    }
+
     var generalPageData: Map<string, PageData> = new Map();
 
     let saved = await browser.storage.local.get(["generalPageData"]);
@@ -425,20 +455,73 @@ async function background() {
                     response.firefoxToBreakTimeLeft = message.settings!.firefoxTimeLimit! * 60_000 - totalFirefoxUseTime;
                     browser.tabs.sendMessage(currentPage, response);
                 }
-                let totalUseTime = totalWebsiteUseTime.get(currentUsed!);
-                if (totalUseTime != null) {
-                    let oldLimitTime = message.settings.websiteTimeLimit?.get(currentUsed!);
-                    let newLimitTime = settings.websiteTimeLimit?.get(currentUsed!)
-
-                    if (oldLimitTime?.limitTime != newLimitTime?.limitTime) {
-                        let response = new MessageFromBackground();
-                        if (newLimitTime != null) {
-                            response.websiteToBreakTimeLeft = newLimitTime!.limitTime * 60_000 - totalUseTime.timeCounted;
-                        } else {
-                            response.websiteToBreakTimeLeft = -1;
-                        }
-                        browser.tabs.sendMessage(currentPage, response);
+            }
+            if (!mapsAreEqual(message.settings.websiteTimeLimit!, settings.websiteTimeLimit!)) {
+                //Set non existing (set by hand timing) to auto created
+                for (const [key, value] of totalWebsiteUseTime) {
+                    if (!message.settings.websiteTimeLimit!.has(key)) {
+                        value.auto_created = true;
                     }
+                }
+                //Collapse Auto Created Values into the hand made ones
+                for (const [key, value] of message.settings.websiteTimeLimit!) {
+                    for (const [key2, value2] of totalWebsiteUseTime) {
+                        if (value2.auto_created) {
+                            if (value.regex) {
+                                let regex = new RegExp(key);
+                                if (regex.test(key2)) {
+                                    totalWebsiteUseTime.delete(key2)
+                                    let gotten = totalWebsiteUseTime.get(key)
+                                    if (gotten == null) {
+                                        value2.auto_created = false;
+                                        totalWebsiteUseTime.set(key, value2)
+                                    } else {
+                                        gotten.auto_created = false;
+                                        gotten.timeCounted += value2.timeCounted;
+                                    }
+                                }
+                            } else {
+                                if (key2.endsWith(key)) {
+                                    totalWebsiteUseTime.delete(key2)
+                                    let gotten = totalWebsiteUseTime.get(key)
+                                    if (gotten == null) {
+                                        value2.auto_created = false;
+                                        totalWebsiteUseTime.set(key, value2)
+                                    } else {
+                                        gotten.auto_created = false;
+                                        gotten.timeCounted += value2.timeCounted;
+                                    }
+                                }
+                            }
+                            if (currentUsed == key2) {
+                                //Check if current page matches
+                                if (value.regex) {
+                                    let regex = new RegExp(key);
+                                    if (regex.test(message.pageUrl)) {
+                                        currentUsed = key;
+                                    }
+                                } else {
+                                    if (message.pageUrl.endsWith(key)) {
+                                        currentUsed = key;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                //Update To Break Time Left On Current Site
+                if (currentUsed != null) {
+                    let limitData = message.settings.websiteTimeLimit!.get(currentUsed)
+                    let response = new MessageFromBackground();
+                    if (limitData != null) {
+                        let timeData = totalWebsiteUseTime.get(currentUsed)!
+
+                        response.websiteToBreakTimeLeft = limitData!.limitTime * 60_000 - timeData.timeCounted;
+                    } else {
+                        response.websiteToBreakTimeLeft = -1
+                    }
+
+                    browser.tabs.sendMessage(currentPage!, response);
                 }
             }
 
