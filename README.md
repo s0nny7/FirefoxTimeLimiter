@@ -2,12 +2,17 @@
 
 Extension for Firefox Web Browser. Monitor And Limit the time you spend on websites and in total. Allows for custom break time.
 
-Floating Panel (created on every page by this extension) is Both Resizeable and Movable. Minimalize it by clicking the clock icon
+Floating Panel (created on every page by this extension) is Both Resizeable and Movable. Minimize it by clicking the clock icon
 
 ## Screenshots
 
 - TODO Without Extending Screenshot
 - TODO With Extending Screenshot
+- TODO Minimized Screenshot
+
+## Functionality
+
+TODO
 
 ## Development
 
@@ -18,14 +23,13 @@ Add `"browsingData"` permission to the list in [manifest.json](/src/manifest.jso
 ## Plans
 
 - Time's up Panel
-  - [ ] [Auto Pause Videos on Time's Up](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/pause)
-  - [ ] [also exit fullscreen](https://developer.mozilla.org/en-US/docs/Web/API/Document/exitFullscreen)
-  - [ ] Half Transparent Panel
-  - [ ] Show Icon
-  - [ ] Time's Up Message
-  - [ ] Stop Break Button
-  - [ ] Fade In
-  - [ ] Stop Break After Some Time Button
+  - [x] [Auto Pause Videos on Time's Up](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/pause)
+  - [x] [also exit fullscreen](https://developer.mozilla.org/en-US/docs/Web/API/Document/exitFullscreen)
+  - [x] Half Transparent Panel
+  - [x] Show Icon
+  - [x] Time's Up Message
+  - [x] Stop Break Button
+  - [x] Fade In
 - Limiter Window
   - [x] Movable and Resizable Panel
   - [x] Limit Position (to 0 and max page size)
@@ -42,9 +46,9 @@ Add `"browsingData"` permission to the list in [manifest.json](/src/manifest.jso
     - [x] Show Current Time While Using Current Website
     - [x] Reset Break Time On This Page Button
     - [x] Set Time Limit In Firefox
-    - [ ] Set Time Limit On Pages List
+    - [x] Set Time Limit On Pages List
     - [x] Set Break Time for Firefox
-    - [ ] Set Break Time List
+    - [x] Set Break Time List
     - [x] Reset Limit Counting after X Hours of Inactivity
     - [x] Edit Transparency
     - [x] Edit Background Transparency
