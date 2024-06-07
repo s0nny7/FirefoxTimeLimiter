@@ -109,6 +109,17 @@ function updatePanelHeight() {
 }
 
 function enterBreak(breakTimeLeft: number) {
+    let mediaElements = document.getElementsByTagName("video");
+    for (const element of mediaElements) {
+        element.pause();
+    }
+    let audioElements = document.getElementsByTagName("audio")
+    for (const element of audioElements) {
+        element.pause();
+    }
+    if (document.fullscreenElement != null) {
+        document.exitFullscreen();
+    }
     if (breakPanel == null) {
         let old = document.getElementById("com-limitlost-limiter-break-panel")
         //Remove Old Panel If it Already Exists
@@ -913,7 +924,7 @@ async function createPanel() {
                 let leftOffset;
                 //Left Bounds check
                 if (leftOffsetPx + panel!.offsetWidth > window.innerWidth) {
-                    leftOffset = (window.innerWidth - panelContainer!.offsetWidth) / window.innerWidth * 100
+                    leftOffset = Math.max((window.innerWidth - panelContainer!.offsetWidth) / window.innerWidth * 100, 0)
                 } else if (leftOffsetPx < 0) {
                     leftOffset = 0
                 } else {
@@ -924,7 +935,7 @@ async function createPanel() {
                 let topOffset;
                 //Top bounds check
                 if (topOffsetPx + panelContainer!.offsetHeight > window.innerHeight) {
-                    topOffset = (window.innerHeight - panelContainer!.offsetHeight) / window.innerHeight * 100
+                    topOffset = Math.max((window.innerHeight - panelContainer!.offsetHeight) / window.innerHeight * 100, 0)
                 } else if (topOffsetPx < 0) {
                     topOffset = 0
                 } else {
@@ -987,10 +998,10 @@ async function createPanel() {
         if (pageData?.positionX == null) {
             panelContainer!.style.setProperty("left", `calc(90% - ${width}px)`, "important");
         } else {
-            panelContainer!.style.setProperty("left", `${pageData?.positionX}%`, "important");
+            panelContainer!.style.setProperty("left", `${Math.max(pageData?.positionX, 0)}%`, "important");
         }
         if (pageData?.positionY != null) {
-            panelContainer!.style.setProperty("top", `${pageData?.positionY}%`, "important");
+            panelContainer!.style.setProperty("top", `${Math.max(pageData?.positionY, 0)}%`, "important");
         }
         panelContainer!.style.setProperty("height", (rect.height - extendedRect.height) + "px", "important");
         panelContainer!.style.setProperty("width", `${width}px`, "important");

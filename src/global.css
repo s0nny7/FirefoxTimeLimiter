@@ -41,3 +41,27 @@
 #com-limitlost-limiter-panel-container.com-limitlost-limiter-animated.com-limitlost-limiter-transition {
     transition: width 0.2s, height 0.2s !important;
 }
+
+#com-limitlost-limiter-break-panel {
+    position: fixed !important;
+    left    : 0 !important;
+    top     : 0 !important;
+    z-index : 2147483646 !important;
+    width   : 100dvw !important;
+    height  : 100dvh !important;
+
+    margin          : 0 !important;
+    padding         : 0 !important;
+    border-radius   : 0 !important;
+    border          : none !important;
+    outline         : none !important;
+    background-color: transparent !important;
+    background      : transparent !important;
+
+    opacity: 0 !important;
+
+}
+
+#com-limitlost-limiter-break-panel.com-limitlost-limiter-animated {
+    transition: opacity 0.2s !important;
+}
