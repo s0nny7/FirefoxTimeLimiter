@@ -47,7 +47,6 @@ class Settings {
      */
     firefoxBreakTime: number | null = null;
     websiteTimeLimit: Map<string, PageLimitData> | null = null;
-    breakTime: boolean | null = null;
     transparency: number | null = null;
     backgroundTransparency: number | null = null;
     /**
@@ -70,14 +69,14 @@ class Settings {
         this.firefoxTimeLimit = this.firefoxTimeLimit ?? -1;
         this.firefoxBreakTime = this.firefoxBreakTime ?? -1;
         this.websiteTimeLimit = this.websiteTimeLimit ?? new Map();
-        this.breakTime = this.breakTime ?? false;
         this.transparency = this.transparency ?? 1;
         this.backgroundTransparency = this.backgroundTransparency ?? 0.8;
         this.resetTimeCountAfter = this.resetTimeCountAfter ?? 6;
     }
 
     async load() {
-        let saved = await browser.storage.local.get(["generalPageData",
+        let saved = await browser.storage.local.get([
+            "updateTimerPerMiliseconds",
             "animations",
             "darkMode",
             "countTimeOnLostFocus",
@@ -85,11 +84,12 @@ class Settings {
             "showCurrentTimeWebsite",
             "firefoxTimeLimit",
             "websiteTimeLimit",
-            "breakTime",
             "firefoxBreakTime",
             "websiteBreakTime",
             "transparency",
-            "backgroundTransparency"]);
+            "backgroundTransparency",
+            "resetTimeCountAfter"
+        ]);
 
         this.updateTimerPerMiliseconds = saved["updateTimerPerMiliseconds"];
         this.animations = saved["animations"];
@@ -102,7 +102,6 @@ class Settings {
         if (saved["websiteTimeLimit"] != null) {
             this.websiteTimeLimit = new Map(JSON.parse(saved["websiteTimeLimit"]));
         }
-        this.breakTime = saved["breakTime"];
         this.transparency = saved["transparency"];
         this.backgroundTransparency = saved["backgroundTransparency"];
 
@@ -123,7 +122,6 @@ class Settings {
             "firefoxTimeLimit": this.firefoxTimeLimit,
             "firefoxBreakTime": this.firefoxBreakTime,
             "websiteTimeLimit": websiteTimeLimit,
-            "breakTime": this.breakTime,
             "transparency": this.transparency,
             "backgroundTransparency": this.backgroundTransparency,
             "resetTimeCountAfter": this.resetTimeCountAfter
