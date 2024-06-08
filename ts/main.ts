@@ -461,9 +461,13 @@ function applySettings() {
         //Count Time On Lost Focus
         countTimeOnLostFocusCheckBox!.checked = page_settings.countTimeOnLostFocus!;
         //Page Rules
-        for (const item of newPageRuleRow!.parentElement!.children) {
-            if (item.classList.contains("created-page-rule")) {
-                item.remove();
+        let foundDeleted = true;
+        while (foundDeleted) {
+            let next = templatePageRuleRow?.nextElementSibling
+            if (next != null && next.classList.contains("created-page-rule")) {
+                next.remove();
+            } else {
+                foundDeleted = false;
             }
         }
         for (const [key, value] of page_settings.websiteTimeLimit!) {
