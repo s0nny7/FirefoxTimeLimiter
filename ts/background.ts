@@ -91,7 +91,8 @@ async function background() {
 
     function resetTimeData() {
         totalFirefoxUseTime = 0;
-        totalWebsiteUseTime = new Map();
+        firefoxBreakTimeLeft = null;
+        totalWebsiteUseTime.clear();
         saveTimeData();
     }
     function resetTimeDataCheck(currentTimeMillis: number) {
@@ -388,8 +389,12 @@ async function background() {
                 let pageData = totalWebsiteUseTime.get(currentUsed);
                 if (pageData != null) {
                     pageData.timeCounted += diff;
-                    message.pageTimeUpdate = pageData.timeCounted;
+                } else {
+                    pageData = new PageTimeData(true);
+                    pageData.timeCounted = diff;
+                    totalWebsiteUseTime.set(currentUsed, pageData);
                 }
+                message.pageTimeUpdate = pageData.timeCounted;
 
                 if (pageLoading) {
                     return;
