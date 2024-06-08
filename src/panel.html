@@ -61,12 +61,12 @@
                 <div class="input-container">
                     Time Limit Firefox: <span class="small-note-text">(In Minutes, set to 0 or negative to
                         disable)</span>
-                    <input id="time-limit-firefox" type="number">
+                    <input id="time-limit-firefox" type="number" step="any">
                 </div>
                 <div class="input-container">
                     Firefox Break Length: <span class="small-note-text">(In Minutes, set to 0 or negative to
                         disable)</span>
-                    <input id="break-time-firefox" type="number">
+                    <input id="break-time-firefox" type="number" step="any">
                 </div>
                 <div id="page-rules-title">Page Limit And Break Rules:</div>
                 <div id="page-rules-table-parent">
@@ -99,10 +99,10 @@
                                 <input class="page-name" type="text">
                             </td>
                             <td>
-                                <input class="page-time-limit" type="number">
+                                <input class="page-time-limit" type="number" step="any">
                             </td>
                             <td>
-                                <input class="page-break-length" type="number">
+                                <input class="page-break-length" type="number" step="any">
                             </td>
                         </tr>
                         <tr id="new-page-rule-row">
@@ -148,7 +148,7 @@
                 </label>
                 <div class="input-container">Reset Time Count After: <span class="small-note-text">(In Hours, set
                         to 0
-                        or negative to disable)</span><input id="reset-time-count-after" type="number">
+                        or negative to disable)</span><input id="reset-time-count-after" type="number" step="any">
                 </div>
                 <button type="button" id="reset-page-time" class="full-width">Reset Page Time Count</button>
                 <button type="button" id="reset-firefox-time" class="full-width">Reset Firefox Time Count</button>
