@@ -1015,8 +1015,6 @@ async function createPanel() {
 
         createContent();
 
-        let extendedRect = extendedDivParent!.getBoundingClientRect()
-
         let width = pageData?.width;
         if (width == null) {
             width = panel!.clientWidth;
@@ -1029,9 +1027,14 @@ async function createPanel() {
         if (pageData?.positionY != null) {
             panelContainer!.style.setProperty("top", `${Math.max(pageData?.positionY, 0)}%`, "important");
         }
-        panelContainer!.style.setProperty("height", extendedRect.top + "px", "important");
+        setTimeout(() => {
+            let extendedRect = extendedDivParent!.getBoundingClientRect()
+            panelContainer!.style.setProperty("height", extendedRect.top + "px", "important");
+
+        }, 200)
         panelContainer!.style.setProperty("width", `${width}px`, "important");
         panelContainer!.classList.remove("com-limitlost-limiter-initializing")
+        panelContainer!.classList.add("com-limitlost-limiter-transition")
     }
 
     panelContainer.appendChild(panel);
