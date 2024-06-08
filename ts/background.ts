@@ -300,6 +300,7 @@ async function background() {
                     value.breakTimeLeft -= diff;
                     if (value.breakTimeLeft <= 0) {
                         value.breakTimeLeft = null;
+                        value.timeCounted = 0;
                     }
                 }
                 if (currentUsed == key) {
@@ -555,6 +556,7 @@ async function background() {
                 let pageData = totalWebsiteUseTime.get(currentUsed);
                 if (pageData != null && pageData.breakTimeLeft != null) {
                     pageData.breakTimeLeft = null;
+                    pageData.timeCounted = 0;
                     let message = new MessageFromBackground()
                     message.break = BreakType.None;
                     browser.tabs.sendMessage(currentPage!, message)
