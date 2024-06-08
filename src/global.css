@@ -39,7 +39,7 @@
 }
 
 #com-limitlost-limiter-panel-container.com-limitlost-limiter-animated.com-limitlost-limiter-transition {
-    transition: width 0.2s, height 0.2s !important;
+    transition: opacity 0.2s, width 0.2s, height 0.2s !important;
 }
 
 #com-limitlost-limiter-break-panel {
