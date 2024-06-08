@@ -83,6 +83,7 @@ var countTimeOnLostFocusCheckBox: HTMLInputElement | null = null;
 
 var panelResizeObserver: ResizeObserver | null = null;
 var pageRulesResizeObserver: ResizeObserver | null = null;
+var extendHeightTimeout: number | null = null;
 
 var breakPanel: HTMLIFrameElement | null = null;
 var breakType: BreakType = BreakType.None;
@@ -606,8 +607,11 @@ function createContent() {
     extendButton.onclick = () => {
         let rect = panelContainer!.getBoundingClientRect()
         let extendedRect = extendedDivParent!.getBoundingClientRect()
-        let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
         if (extended) {
+            if (extendHeightTimeout != null) {
+                clearTimeout(extendHeightTimeout);
+                extendHeightTimeout = null;
+            }
             extendButton.innerText = "Extend";
             if (panelContainer!.style.width == "") {
                 panelContainer!.style.setProperty("width", rect.width + "px", "important");
@@ -622,17 +626,28 @@ function createContent() {
             extendedDivParent?.scrollTo(0, 0);
 
         } else {
+            panelContainer!.classList.add("com-limitlost-limiter-transition");
+            function updateHeight() {
+                let rect = panelContainer!.getBoundingClientRect()
+                let extendedRect = extendedDivParent!.getBoundingClientRect()
+                let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
+
+                panelContainer!.style.setProperty("height", rect.height + "px", "important");
+                extendButton.innerText = "Hide";
+                extendedDivParent!.style.maxHeight = "";
+                extendedDivParent!.style.setProperty("height", (advancedRect.top - (extendedRect.top) + advancedRect.height) + "px", "important");
+                panelContainer!.style.setProperty("height", (advancedRect.top + advancedRect.height) + "px", "important");
+
+                extendHeightTimeout = null;
+            }
             if (panelContainer!.style.width == "") {
                 panelContainer!.style.setProperty("width", rect.width + "px", "important");
             }
-            panelContainer!.style.setProperty("height", rect.height + "px", "important");
-            extendButton.innerText = "Hide";
-            panelContainer!.classList.add("com-limitlost-limiter-transition");
-            extendedDivParent!.style.maxHeight = "";
-            extendedDivParent!.style.setProperty("height", (advancedRect.top - (extendedRect.top) + advancedRect.height) + "px", "important");
-            panelContainer!.style.setProperty("height", (advancedRect.top + advancedRect.height) + "px", "important");
             if (pageData!.widthExtended != null) {
                 panelContainer!.style.setProperty("width", pageData!.widthExtended + "px", "important");
+                extendHeightTimeout = setTimeout(updateHeight, 200);
+            } else {
+                updateHeight();
             }
         }
         extended = !extended;
@@ -992,7 +1007,6 @@ async function createPanel() {
 
         createContent();
 
-        let rect = panelContainer!.getBoundingClientRect()
         let extendedRect = extendedDivParent!.getBoundingClientRect()
 
         let width = pageData?.width;
@@ -1007,7 +1021,7 @@ async function createPanel() {
         if (pageData?.positionY != null) {
             panelContainer!.style.setProperty("top", `${Math.max(pageData?.positionY, 0)}%`, "important");
         }
-        panelContainer!.style.setProperty("height", (rect.height - extendedRect.height) + "px", "important");
+        panelContainer!.style.setProperty("height", extendedRect.top + "px", "important");
         panelContainer!.style.setProperty("width", `${width}px`, "important");
         panelContainer!.classList.remove("com-limitlost-limiter-initializing")
     }
