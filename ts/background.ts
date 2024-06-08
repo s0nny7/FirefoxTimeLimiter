@@ -396,10 +396,6 @@ async function background() {
                 }
                 message.pageTimeUpdate = pageData.timeCounted;
 
-                if (pageLoading) {
-                    return;
-                }
-
                 message.firefoxTimeUpdate = totalFirefoxUseTime;
                 browser.tabs.sendMessage(currentPage!, message);
             }
