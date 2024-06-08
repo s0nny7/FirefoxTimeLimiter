@@ -195,6 +195,10 @@ function enterBreak(breakTimeLeft: number) {
 function exitBreak() {
     if (breakExitTimeout == null && breakPanel != null) {
         breakPanel?.style.setProperty("opacity", "0", "important");
+        let timeoutLen = 200;
+        if (!page_settings!.animations) {
+            timeoutLen = 0;
+        }
         breakExitTimeout = setTimeout(() => {
             if (breakPanel != null) {
                 breakPanel.remove();
@@ -204,7 +208,7 @@ function exitBreak() {
                 breakPanel = null;
             }
             breakExitTimeout = null;
-        }, 200);
+        }, timeoutLen);
     }
 
 }
@@ -645,7 +649,11 @@ function createContent() {
             }
             if (pageData!.widthExtended != null) {
                 panelContainer!.style.setProperty("width", pageData!.widthExtended + "px", "important");
-                extendHeightTimeout = setTimeout(updateHeight, 200);
+                let timeoutLen = 200
+                if (!page_settings!.animations) {
+                    timeoutLen = 0;
+                }
+                extendHeightTimeout = setTimeout(updateHeight, timeoutLen);
             } else {
                 updateHeight();
             }
