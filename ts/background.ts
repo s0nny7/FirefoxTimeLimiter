@@ -231,16 +231,10 @@ async function background() {
         }
         currentPage = tabId;
 
-
         if (pageData.status != "complete") {
-            pageLoading = true;
             //Page handling will be done after status update
             return;
-        } else {
-            pageLoading = false;
         }
-
-
 
         initializePage(tabId, hostname, url)
     }
@@ -248,7 +242,6 @@ async function background() {
      * Tab ID
      */
     var currentPage: number | null = null;
-    var pageLoading = false;
     browser.tabs.getCurrent().then(async (tab) => {
         if (tab == null) {
             return;
@@ -262,7 +255,6 @@ async function background() {
         }
 
         await pageHandle(tab.id)
-
     })
 
 
@@ -435,7 +427,6 @@ async function background() {
             pageHandle(tabId)
         }
     })
-
 
 
     async function handleContentMessage(m: any) {

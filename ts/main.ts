@@ -189,7 +189,6 @@ function enterBreak(breakTimeLeft: number) {
             breakPanelTimeLeft!.parentElement!.style.display = "none";
         }
     }
-
 }
 
 function exitBreak() {
@@ -210,7 +209,6 @@ function exitBreak() {
             breakExitTimeout = null;
         }, timeoutLen);
     }
-
 }
 
 var extended = false;
@@ -262,7 +260,6 @@ function applyPageData() {
             }
             colorSchemeMeta.content = metaDarkMode ? "dark" : "light";
         }
-
     }
 }
 
@@ -287,7 +284,6 @@ function getNewPageName() {
         }
     }
     return currentName;
-
 }
 
 function createPageRuleRow(saved: boolean, regex: boolean = false, page_name: string = "", time_limit: number = -1, break_length: number = -1) {
@@ -509,7 +505,6 @@ async function globalStyle() {
     style.href = browser.runtime.getURL("global.css");
 
     document.head.appendChild(style);
-
 }
 globalStyle()
 
@@ -1050,7 +1045,6 @@ async function createPanel() {
             panelContainer!.classList.remove("com-limitlost-limiter-transition")
         }
     });
-
 }
 
 function messageListener(m: any, sender: browser.runtime.MessageSender, sendResponse: ((response?: any) => boolean | void | Promise<any>)) {
@@ -1131,7 +1125,6 @@ function messageListener(m: any, sender: browser.runtime.MessageSender, sendResp
         message.initializationRequest = true;
         browser.runtime.sendMessage(message);
     }
-
 }
 
 browser.runtime.onMessage.addListener(messageListener)
