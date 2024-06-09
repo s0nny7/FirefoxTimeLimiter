@@ -1,4 +1,4 @@
-# Time Limiter Firefox Extension
+# Time Limiter for Firefox
 
 Extension for Firefox Web Browser. Monitor And Limit the time you spend on websites and in total. Allows for custom break time.
 
