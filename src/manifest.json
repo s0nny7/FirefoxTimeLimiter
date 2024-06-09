@@ -10,8 +10,7 @@
     "permissions": [
         "activeTab",
         "tabs",
-        "storage",
-        "browsingData"
+        "storage"
     ],
     "browser_specific_settings": {
         "gecko": {
