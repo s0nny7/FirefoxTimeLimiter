@@ -2,8 +2,6 @@
 
 Extension for Firefox Web Browser. Monitor And Limit the time you spend on websites and in total. Allows for custom break time.
 
-Floating Panel (created on every page by this extension) is Both Resizeable and Movable. Minimize it by clicking the clock icon
-
 ## Screenshots
 
 <img alt="Default Screnshot" src="https://github.com/LimitLost/FirefoxTimeLimiter/blob/f11eaec33ee9a3720259882c40b7074bf5960692/Screenshots/Default.png">
@@ -13,46 +11,41 @@ Floating Panel (created on every page by this extension) is Both Resizeable and 
 
 ## Functionality
 
-TODO
+- Floating Panel
+  - Resizeable
+  - Moveable
+  - Can be minimized by clicking the clock icon (Click it again to unminimize)
+  - Time Left Until Break is Automatically shown when firefox or current page is limited
+- Break Panel
+  - Does not replace current website
+  - Allows to end the break early
+- Settings
+  - Dark Mode
+  - Fix Transparency (Make floating panel transparent if it isn't already)
+  - Firefox
+    - Set Time Limit
+    - Set Break Length
+  - Page Rules
+    - Click `R` Button to enable page url matching using regex
+    - Set Time Limit (In Minutes, set to negative or 0 to disable)
+    - Set Break Length (In Minutes, set to negative or 0 to disable)
+  - Set Floating Panel Opacity
+  - Set Floating Panel Background Opacity
+- Advanced Settings
+  - Show/Hide Firefox Usage Time
+  - Show/Hide Current Website Usage Time
+  - Count time while Firefox is unfocused
+  - Enable/Disable Animations
+  - Reset Time Count after selected amount of time while firefox is inactive/unfocused
+  - Reset Current Page Time Count Button
+  - Reset Firefox Time Count Button
+  - Change Time Update Interval
 
 ## Development
 
 ### Enabling Debug Mode
 
 Add `"browsingData"` permission to the list in [manifest.json](/src/manifest.json)
-
-## Plans
-
-- Time's up Panel
-  - [x] [Auto Pause Videos on Time's Up](https://developer.mozilla.org/en-US/docs/Web/API/HTMLMediaElement/pause)
-  - [x] [also exit fullscreen](https://developer.mozilla.org/en-US/docs/Web/API/Document/exitFullscreen)
-  - [x] Half Transparent Panel
-  - [x] Show Icon
-  - [x] Time's Up Message
-  - [x] Stop Break Button
-  - [x] Fade In
-- Limiter Window
-  - [x] Movable and Resizable Panel
-  - [x] Limit Position (to 0 and max page size)
-  - [x] Static Half transparent
-  - Without Extending:
-    - [x] Minimize Button
-    - [x] Current Time On Page
-    - [x] Time Left Until Break
-    - [x] Extend Button
-  - After Extending:
-    - [x] Disable Animations
-    - [x] Dark Mode
-    - [x] Show Current Time While Using Firefox
-    - [x] Show Current Time While Using Current Website
-    - [x] Reset Break Time On This Page Button
-    - [x] Set Time Limit In Firefox
-    - [x] Set Time Limit On Pages List
-    - [x] Set Break Time for Firefox
-    - [x] Set Break Time List
-    - [x] Reset Limit Counting after X Hours of Inactivity
-    - [x] Edit Transparency
-    - [x] Edit Background Transparency
 
 ## License
 
