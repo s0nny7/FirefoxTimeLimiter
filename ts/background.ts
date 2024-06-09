@@ -190,13 +190,13 @@ async function background() {
             found = hostname
             totalWebsiteUseTime.set(found, new PageTimeData(true));
         }
-
+        currentPage = tabId;
         currentUsed = found
 
         let message = new MessageFromBackground();
         message.pageTimeUpdate = foundTime;
         message.firefoxTimeUpdate = totalFirefoxUseTime;
-        message.pageData = generalPageData.get(found!) ?? new PageData();
+        message.pageData = generalPageData.get(hostname) ?? new PageData();
 
         let breakActive = false;
 
