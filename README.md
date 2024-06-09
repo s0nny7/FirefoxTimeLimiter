@@ -6,9 +6,10 @@ Floating Panel (created on every page by this extension) is Both Resizeable and 
 
 ## Screenshots
 
-- TODO Without Extending Screenshot
-- TODO With Extending Screenshot
-- TODO Minimized Screenshot
+<img alt="Default Screnshot" src="https://github.com/LimitLost/FirefoxTimeLimiter/blob/f11eaec33ee9a3720259882c40b7074bf5960692/Screenshots/Default.png">
+<img alt="Minimized Screnshot" src="https://github.com/LimitLost/FirefoxTimeLimiter/blob/f11eaec33ee9a3720259882c40b7074bf5960692/Screenshots/Minimized.png">
+<img alt="Extended Screnshot" src="https://github.com/LimitLost/FirefoxTimeLimiter/blob/f11eaec33ee9a3720259882c40b7074bf5960692/Screenshots/Extended.png">
+<img alt="Dark Mode Screnshot" src="https://github.com/LimitLost/FirefoxTimeLimiter/blob/f11eaec33ee9a3720259882c40b7074bf5960692/Screenshots/Dark%20Mode.png">
 
 ## Functionality
 
