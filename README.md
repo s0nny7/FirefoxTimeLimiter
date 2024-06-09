@@ -4,7 +4,7 @@ Extension for Firefox Web Browser. Monitor And Limit the time you spend on websi
 
 ## Screenshots
 
-<img alt="Default Screnshot" src="https://github.com/LimitLost/FirefoxTimeLimiter/blob/f11eaec33ee9a3720259882c40b7074bf5960692/Screenshots/Default.png">
+<img alt="Default Screnshot" src="/Screenshots/Default.png">
 <img alt="Minimized Screnshot" src="https://github.com/LimitLost/FirefoxTimeLimiter/blob/f11eaec33ee9a3720259882c40b7074bf5960692/Screenshots/Minimized.png">
 <img alt="Extended Screnshot" src="https://github.com/LimitLost/FirefoxTimeLimiter/blob/f11eaec33ee9a3720259882c40b7074bf5960692/Screenshots/Extended.png">
 <img alt="Dark Mode Screnshot" src="https://github.com/LimitLost/FirefoxTimeLimiter/blob/f11eaec33ee9a3720259882c40b7074bf5960692/Screenshots/Dark%20Mode.png">
