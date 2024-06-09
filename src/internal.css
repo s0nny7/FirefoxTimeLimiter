@@ -456,10 +456,16 @@ input[type="number"] {
     flex: 1;
 }
 
-#save-button,
 #reset-page-time,
 #reset-firefox-time {
     min-width: 50%;
+}
+
+#save-button {
+    min-width: 100%;
+    position : sticky;
+    top      : 0.5rem;
+    z-index  : 1;
 }
 
 .input-container {
