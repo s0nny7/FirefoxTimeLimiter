@@ -423,7 +423,7 @@ async function background() {
     })
     //Wait for the page load
     browser.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-        if (changeInfo.status == "complete" && currentPage == tabId) {
+        if (changeInfo.status == "complete" && (currentPage == tabId || tab.active)) {
             pageHandle(tabId)
         }
     })
