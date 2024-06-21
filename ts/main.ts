@@ -30,7 +30,6 @@ var isDown = false;
 var offset = [0, 0];
 
 //Minimize Variables
-var minimized = false;
 var oldSizeWidth = "";
 var oldSizeHeight = "";
 
@@ -98,13 +97,23 @@ function updatePanelHeight() {
         let advancedRect = advancedOptionsLabel!.getBoundingClientRect()
 
         if (extended) {
-            panelContainer!.style.height = rect.height + "px";
+            if (!pageData!.minimized) {
+                panelContainer!.style.height = rect.height + "px";
+            }
             panelContainer!.classList.add("com-limitlost-limiter-transition");
             extendedDivParent!.style.setProperty("height", (advancedRect.top - (extendedRect.top) + advancedRect.height) + "px", "important");
-            panelContainer!.style.setProperty("height", (advancedRect.top + advancedRect.height) + "px", "important");
+            if (pageData!.minimized) {
+                oldSizeHeight = (advancedRect.top + advancedRect.height) + "px";
+            } else {
+                panelContainer!.style.setProperty("height", (advancedRect.top + advancedRect.height) + "px", "important");
+            }
         } else {
-            panelContainer!.classList.add("com-limitlost-limiter-transition");
-            panelContainer!.style.setProperty("height", (extendedRect.top) + "px", "important");
+            if (pageData!.minimized) {
+                oldSizeHeight = (extendedRect.top) + "px";
+            } else {
+                panelContainer!.classList.add("com-limitlost-limiter-transition");
+                panelContainer!.style.setProperty("height", (extendedRect.top) + "px", "important");
+            }
         }
     }
 }
@@ -245,6 +254,15 @@ function applyPageData() {
             panelContainer.style.setProperty("width", pageData.widthExtended + "px", "important");
         } else {
             panelContainer.style.setProperty("width", pageData.width + "px", "important");
+        }
+        if (pageData!.minimized) {
+            if (oldSizeWidth == "") {
+                oldSizeWidth = panelContainer!.style.width;
+                oldSizeHeight = panelContainer!.style.height;
+            }
+            panelContainer!.style.setProperty("width", "0px", "important");
+            panelContainer!.style.setProperty("height", "0px", "important");
+            panelContainer!.style.setProperty("resize", "none", "important");
         }
         if (pageData.positionX != null) {
             panelContainer.style.setProperty("left", pageData.positionX + "%", "important");
@@ -984,7 +1002,7 @@ async function createPanel() {
 
         let topBarButton = innerDocument.getElementById("top-bar-button")!;
         topBarButton.onclick = function () {
-            if (!minimized) {
+            if (!pageData!.minimized) {
                 if (panelContainer!.style.width == "") {
                     panelContainer!.style.setProperty("width", innerWindow.innerWidth + "px", "important");
                 }
@@ -1001,11 +1019,13 @@ async function createPanel() {
                 panelContainer!.classList.add("com-limitlost-limiter-transition");
                 panelContainer!.style.setProperty("width", oldSizeWidth, "important");
                 panelContainer!.style.setProperty("height", oldSizeHeight, "important");
+                oldSizeWidth = "";
+                oldSizeHeight = "";
                 panelContainer!.style.resize = "";
             }
 
-
-            minimized = !minimized
+            pageData!.minimized = !pageData!.minimized
+            pageDataUpdate();
         }
 
         createContent();
@@ -1022,9 +1042,19 @@ async function createPanel() {
         if (pageData?.positionY != null) {
             panelContainer!.style.setProperty("top", `${Math.max(pageData?.positionY, 0)}%`, "important");
         }
+
         setTimeout(() => {
             let extendedRect = extendedDivParent!.getBoundingClientRect()
             panelContainer!.style.setProperty("height", extendedRect.top + "px", "important");
+            panelContainer!.style.setProperty("width", `${width}px`, "important");
+
+            if (pageData!.minimized) {
+                oldSizeWidth = panelContainer!.style.width;
+                oldSizeHeight = panelContainer!.style.height;
+                panelContainer!.style.setProperty("width", "0px", "important");
+                panelContainer!.style.setProperty("height", "0px", "important");
+                panelContainer!.style.setProperty("resize", "none", "important");
+            }
 
         }, 200)
         panelContainer!.style.setProperty("width", `${width}px`, "important");
@@ -1056,6 +1086,9 @@ function messageListener(m: any, sender: browser.runtime.MessageSender, sendResp
     }
     if (message.pageData != null) {
         pageData = message.pageData
+        if (pageData.minimized == null) {
+            pageData.minimized = false;
+        }
         applyPageData();
     }
     if (message.pageTimeUpdate != null) {

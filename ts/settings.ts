@@ -11,6 +11,7 @@ class PageLimitData {
 }
 
 class PageData {
+    minimized: boolean | undefined = false;
     positionX: number | null = null;
     positionY: number | null = null;
     width: number | null = null;
