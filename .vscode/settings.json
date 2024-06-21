@@ -1,0 +1,10 @@
+{
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.ts$",
+                "cmd": "tsc -p ./ts/tsconfig.json"
+            }
+        ]
+    }
+}
